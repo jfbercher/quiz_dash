@@ -155,7 +155,10 @@ if url and secret and quiz_file:
             if st.checkbox("Collect anomalies per student", value=False, 
                            help="Group anomalies per student"):
                 Grouped_tab_report = group_anomalies_per_student(Tab_report)
-                st.dataframe(Grouped_tab_report, width='stretch', hide_index=True)
+                if not Grouped_tab_report.empty:
+                    st.dataframe(Grouped_tab_report, width='stretch', hide_index=True)
+                else:
+                    st.info("No anomalies found at all.")
             else:
             #st.dataframe(pd.DataFrame(monitoring_data), width='stretch', hide_index=True)
                 st.dataframe(Tab_report, width='stretch', hide_index=True)
