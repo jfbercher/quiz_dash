@@ -4,8 +4,8 @@ import time
 from streamlit_autorefresh import st_autorefresh
 import matplotlib.pyplot as plt
 # Import de vos fonctions personnalisées
-from labquizdev.main import QuizLab
-from labquizdev.putils import (
+from labquiz.main import QuizLab
+from labquiz.putils import (
     readData, 
     check_integrity_msg, 
     check_hash_integrity, 
@@ -92,7 +92,7 @@ if url and secret and quiz_file:
         df, df_filt = readData(url, secret)
         # 2. Instancier un quiz avec le fichier de quiz CONTENANT les valeurs attendues
          
-        from labquizdev.utils import get_full_object_hash, get_big_integrity_hash
+        from labquiz.utils import get_full_object_hash, get_big_integrity_hash
         params = eval(params_str)
         quiz = QuizLab("", quiz_file, needAuthentification=False, mandatoryInternet=False, 
                        in_streamlit=True, **params)              
@@ -112,7 +112,7 @@ if url and secret and quiz_file:
         tab_mon, tab_mon_graph, tab_corr = st.tabs(["📡 Integrity Live", "Monitoring", "🎯 Correction & Notes"])
 
         with tab_mon:
-            from labquizdev.putils import make_anomalies_df_report, group_anomalies_per_student
+            from labquiz.putils import make_anomalies_df_report, group_anomalies_per_student
 
             st.subheader("Suivi de l'intégrité en temps réel")
             monitoring_data = [] 
