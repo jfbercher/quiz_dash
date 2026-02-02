@@ -4,5 +4,5 @@ pandas
 ruamel.yaml
 streamlit>=1.5
 streamlit_autorefresh
-altair==4.2.2
+altair
 git+https://github.com/jfbercher/labquiz.git#egg=labquiz
