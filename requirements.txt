@@ -2,7 +2,7 @@ matplotlib
 numpy
 pandas
 ruamel.yaml
-streamlit>=1.5
+streamlit>=1.50
 streamlit_autorefresh
 altair
 git+https://github.com/jfbercher/labquiz.git#egg=labquiz
