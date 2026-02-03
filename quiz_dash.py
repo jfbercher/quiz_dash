@@ -13,7 +13,7 @@ from labquiz.putils import (
 )
 
 # --- CONFIGURATION DE LA PAGE ---
-st.set_page_config(page_title="Dashboard ASSL - Quiz", layout="wide", 
+st.set_page_config(page_title="Dashboard LabQuiz", layout="wide", 
                    page_icon="1F4CA.png")#"📊")
 
 # --- INITIALISATION DU SESSION STATE ---
