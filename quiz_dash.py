@@ -3,7 +3,7 @@ import pandas as pd
 import time
 from streamlit_autorefresh import st_autorefresh
 import matplotlib.pyplot as plt
-# Import de vos fonctions personnalisées
+# Import des fonctions labquiz
 from labquiz.main import QuizLab
 from labquiz.putils import (
     readData, 
@@ -289,7 +289,7 @@ if url and secret and quiz_file:
                         st.session_state.df_results.drop(columns='maxpts', inplace=True, errors='ignore')
                         st.success("Scores calculés !")
                 
-                        questions = [c for c in st.session_state.df_results.columns if c not in ["student", "maxpts","Note"]]                    
+                        questions = [c for c in st.session_state.df_results.columns if c not in ["student", "maxpts","FinalMark"]]                    
                         st.session_state.coeffs = {q: float(b_dict.get(q, 1.0)) for q in questions}  
               
                 st.session_state.df_final = st.session_state.df_results
@@ -301,7 +301,7 @@ if url and secret and quiz_file:
                         coeffs = adj_bareme.loc["Coefficient"] #dict
                         res_copy = st.session_state.df_results.copy()
                         if exam_title == "":
-                            res_copy["Note"] = res_copy[questions].dot(coeffs)*(20/sum(coeffs))
+                            res_copy["FinalMark"] = res_copy[questions].dot(coeffs)*(20/sum(coeffs))
                         else:
                             res_copy = correctQuizzesDf(data=df, data_filt=df_filt, quiz=quiz, 
                                     title=exam_title, seuil=seuil, weights=final_weights, 
@@ -313,7 +313,7 @@ if url and secret and quiz_file:
                 if st.session_state.df_final is not None:
                     
                     st.markdown("#### ⚖️ Ajuster le Barème")
-                    questions = [c for c in st.session_state.df_results.columns if c not in ["student", "maxpts","Note"]]
+                    questions = [c for c in st.session_state.df_results.columns if c not in ["student", "maxpts","FinalMark"]]
                     
                     # Création d'un mini-tableau pour ajuster les poids sans tout recalculer
 
@@ -327,8 +327,8 @@ if url and secret and quiz_file:
 
                     recompute_score()
 
-                    avg_note = st.session_state.df_final["Note"].mean()
-                    std_note = st.session_state.df_final["Note"].std()
+                    avg_note = st.session_state.df_final["FinalMark"].mean()
+                    std_note = st.session_state.df_final["FinalMark"].std()
                     st.markdown("#### Tableau des Notes")
                     st.caption(f"Moyenne : {avg_note:.2f} / 20. Ecart-type : {std_note:.2f}")
 
