@@ -1,0 +1,317 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-20 14:35+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:45
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:43
+msgid "Dashboard LabQuiz"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:60
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:58
+msgid "🔑 Connection"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:61
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:59
+msgid "Google Sheet URL"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:62
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:60
+msgid "Secret Key"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:63
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:61
+msgid "QUIZ file (YAML) containing corrections"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:66
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:64
+msgid "⏱️ Monitoring"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:67
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:65
+msgid "Refresh rate (min)"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:68
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:66
+msgid "Enable auto-refresh"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:76
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:74
+msgid "📊 Monitoring & Correction Dashboard"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:78
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:76
+msgid "🛠️ Parameter Configuration (Integrity & Correction)"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:82
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:80
+msgid "**Monitoring & Source**"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:83
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:81
+msgid ""
+"Parameters to monitor (e.g.: {'retries':2, 'exam_mode':True, 'test_mode':"
+"False})"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:84
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:82
+msgid "Number of allowed attempts"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:87
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:85
+msgid "**Grading Algorithm**"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:88
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:86
+msgid "Threshold (0 to avoid negative marks)"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:89
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:87
+msgid "Exam title (if randomized)"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:95
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:93
+msgid "**Weights Matrix**"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:98
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:106
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:96
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:104
+msgid "TP (True Positive)"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:99
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:107
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:97
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:105
+msgid "FP (False Positive)"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:100
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:108
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:98
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:106
+msgid "FN (False Negative)"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:101
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:109
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:99
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:107
+msgid "TN (True Negative)"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:113
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:111
+msgid "**Grading scale per question**"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:114
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:112
+msgid "Scale dictionary (e.g.: {'q1': 2})"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:141
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:139
+msgid "📡 Integrity Live"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:141
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:139
+msgid "Monitoring"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:141
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:139
+msgid "🎯 Correction & Grades"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:146
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:144
+msgid "Real-time integrity monitoring"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:154
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:152
+msgid "Error in parameters format."
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:158
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:156
+msgid "Also use full hash"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:159
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:157
+msgid "Use the full hash of the source code, live object and parameters"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:161
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:159
+msgid "Only display anomalies"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:162
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:160
+msgid "Display anomalies only, or full report"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:168
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:166
+msgid "Collect anomalies per student"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:169
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:167
+msgid "Group anomalies per student"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:174
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:172
+msgid "No anomalies found at all."
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:179
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:177
+msgid "Activity monitoring"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:205
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:203
+msgid "Number of quizzes completed"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:216
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:214
+msgid "Obtained score"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:229
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:227
+msgid "Quizzes completed by the group"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:240
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:238
+msgid "Number of quizzes per student"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:244
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:242
+msgid "Quizzes completed - whole class"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:256
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:254
+msgid "#### Number of individual quizzes"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:266
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:264
+msgid "Correction & Grades"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:271
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:269
+msgid "🚀 Launch full correction"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:274
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:272
+msgid "Calculating scores per question..."
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:293
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:291
+msgid "Scores calculated!"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:303
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:325
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:301
+msgid "Coefficient"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:319
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:317
+msgid "#### ⚖️ Adjust Scale"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:324
+msgid "AvgScore"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:335
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:333
+msgid "#### Grades Table"
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:342
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:340
+msgid "Scores per question available. Click Recalculate to see final marks."
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:344
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:342
+msgid "Waiting for correction to start."
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash_en.py:350
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:348
+msgid "Please enter URL and SECRET in the sidebar, and load a quiz file."
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:70
+msgid "Last update: "
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:268
+msgid "Last update of corrections (before auto-refresh): "
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:271
+msgid "Last update of corrections: "
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:334
+msgid "Average: "
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:334
+msgid "Standard deviation: "
+msgstr ""
+
+#: /Users/bercherj/JFB/dev/quiz_dash/quiz_dash.py:346
+msgid "Error during reading or processing: "
+msgstr ""
