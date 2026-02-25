@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quiz_dash"
-version = "0.8.8.1"
+version = "0.8.8.5"
 description = "Quizzes intégrés pour Jupyter"
 license = { text = "GPL-3.0-or-later" }
 authors = [
@@ -33,4 +33,4 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools.package-data]
-"quiz_editor" = ["**/*.mo", "**/*.po"]
+"quiz_dash" = ["**/*.mo", "**/*.po"]
