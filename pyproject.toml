@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quiz_dash"
-version = "0.8.8"
+version = "0.8.8.1"
 description = "Quizzes intégrés pour Jupyter"
 license = { text = "GPL-3.0-or-later" }
 authors = [
@@ -23,7 +23,7 @@ dependencies = [
 keywords = ["quizzes", "jupyter"]
 
 [project.scripts]
-quiz_editor = "quiz_dash.cli:main"
+quiz_dash = "quiz_dash.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
