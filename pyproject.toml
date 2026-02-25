@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quiz_dash"
+version = "0.8.8"
+description = "Quizzes intégrés pour Jupyter"
+license = { text = "GPL-3.0-or-later" }
+authors = [
+    { name = "J.-F. Bercher", email = "jf.bercher@esiee.fr" }
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "ruamel.yaml",
+    "streamlit>=1.50",
+    "streamlit_autorefresh",
+    "altair==4.2.2",
+    "labquiz @ git+https://github.com/jfbercher/labquiz.git"
+]
+keywords = ["quizzes", "jupyter"]
+
+[project.scripts]
+quiz_editor = "quiz_dash.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"quiz_editor" = ["**/*.mo", "**/*.po"]
