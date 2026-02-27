@@ -42,7 +42,7 @@ def main():
 
     # --- PAGE CONFIGURATION ---
     st.set_page_config(page_title=_("Dashboard LabQuiz"), layout="wide", 
-                    page_icon="1F4CA.png")#"📊")
+                    page_icon="src/quiz_dash/1F4CA.png")#"📊")
 
     # --- SESSION STATE INITIALIZATION ---
     if "df_results" not in st.session_state:
