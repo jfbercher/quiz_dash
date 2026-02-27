@@ -79,7 +79,7 @@ def main():
         
         with col_p1:
             st.markdown(_("**Monitoring & Source**"))
-            params_str = st.text_input(_("Parameters to monitor (e.g.: {'retries':2, 'exam_mode':True, 'test_mode':False})"), value="{}", key="params_str")
+            params_str = st.text_input(_("Parameters to monitor (e.g.: {'retries':2, 'exam_mode':False, 'test_mode':False})"), value="{'retries':2, 'exam_mode':False, 'test_mode':False}", key="params_str")
             maxtries = st.number_input(_("Number of allowed attempts"), min_value=1, value=3, key="maxtries")
             
         with col_p2:
