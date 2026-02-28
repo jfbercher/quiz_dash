@@ -253,10 +253,15 @@ def main():
                 )
 
                 st.markdown(_("#### Number of individual quizzes"))
+                #quiz_count_by_student["nb"] = quiz_count_by_student["nb"].astype(int)
+
                 st.dataframe(quiz_count_by_student, 
                         column_config={
                         'student': st.column_config.TextColumn(width='medium'),
-                        'nb': st.column_config.TextColumn(width='small'),
+                        'nb': st.column_config.NumberColumn(
+                            width="small",
+                            format="%d"  
+                        ),
                         'quizzes_list': st.column_config.TextColumn(width='medium')
                         }
                     )
