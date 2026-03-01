@@ -95,20 +95,23 @@ Designed to support controlled exam conditions.
 * Recompute scores with updated parameters
 
 ---
+<div align="center">
+  <img src="path/to/your/image.png" width="50%" height="auto" alt="Centered image">
+</div>   
 
 Some screenshots of actual monitoring:
 <div align="center">
-  <img src="[path/to/your/image.png](https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/dash_parameters.png)" width="80%" height="auto" alt="dash_parameters">
+  <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/dash_parameters.png" width="80%" height="auto" alt="dash_parameters">
 </div>   
 `quiz_dash` -- Dash parameters
 
 <div align="center">
-  <img src="[path/to/your/image.png](https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_integrity.png)" width="80%" height="auto" alt="Monitoring_integrity">
+  <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_integrity.png" width="80%" height="auto" alt="Monitoring_integrity">
 </div>   
 `quiz_dash` -- Integrity monitoring
 
 <div align="center">
-  <img src="[path/to/your/image.png](https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_quizzes.png)" width="50%" height="auto" alt="Monitoring_activity">
+  <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_quizzes.png" width="50%" height="auto" alt="Monitoring_activity">
 </div>   
 `quiz_dash` -- Monitoring of quizzes taken by students and the group. Automatic refresh possible and adjustable (student names have been hidden)
 
