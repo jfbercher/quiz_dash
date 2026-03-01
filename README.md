@@ -95,9 +95,6 @@ Designed to support controlled exam conditions.
 * Recompute scores with updated parameters
 
 ---
-<div align="center">
-  <img src="path/to/your/image.png" width="50%" height="auto" alt="Centered image">
-</div>   
 
 Some screenshots of actual monitoring:
 <div align="center">
