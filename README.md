@@ -44,9 +44,11 @@ pip install git+https://github.com/jfbercher/quiz_dash.git
 
 ## Launch
 
+An entry-point is provided that allows to simply use 
 ```bash
-streamlit run quiz_dash.py
+quiz_dash
 ```
+at the command line. 
 
 Or use the hosted version:
 
