@@ -97,38 +97,25 @@ Designed to support controlled exam conditions.
 ---
 
 Some screenshots of actual monitoring:
-:::{figure} https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/dash_parameters.png
-:name: dash_parameters
-:label:fig26
-:alt: quiz_dash
-:align: center
-:width: 90%
-`quiz_dash` -- Entering monitoring/correction configuration parameters
-:::
-:::{figure} https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_integrity.png
-:name: Monitoring_integrity
-:label:fig27
-:alt: quiz_dash
-:align: center
-:width: 90%
+<div align="center">
+  <img src="[path/to/your/image.png](https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/dash_parameters.png)" width="80%" height="auto" alt="dash_parameters">
+</div>   
+`quiz_dash` -- Dash parameters
+
+<div align="center">
+  <img src="[path/to/your/image.png](https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_integrity.png)" width="80%" height="auto" alt="Monitoring_integrity">
+</div>   
 `quiz_dash` -- Integrity monitoring
-:::
-:::{figure} https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_quizzes.png
-:name: Monitoring_activity
-:label:fig28
-:alt: quiz_dash
-:align: center
-:width: 90%
+
+<div align="center">
+  <img src="[path/to/your/image.png](https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_quizzes.png)" width="50%" height="auto" alt="Monitoring_activity">
+</div>   
 `quiz_dash` -- Monitoring of quizzes taken by students and the group. Automatic refresh possible and adjustable (student names have been hidden)
-:::
-:::{figure} https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_marks.png
-:name: Monitoring_marks
-:label:fig29
-:alt: quiz_dash
-:align: center
-:width: 90%
+
+<div align="center">
+  <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_marks.png" width="80%" height="auto" alt="Monitoring_marks image">
+</div>   
 `quiz_dash` -- Automated correction, with the option to adjust the scoring system (automatic recalculation); (student names have been hidden). Of course, the results table can be downloaded.  
-:::
 
 
 ## Typical Workflow
