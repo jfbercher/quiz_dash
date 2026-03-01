@@ -99,24 +99,27 @@ Designed to support controlled exam conditions.
 Some screenshots of actual monitoring:
 <div align="center">
   <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/dash_parameters.png" width="80%" height="auto" alt="dash_parameters">
-</div>   
+ 
 `quiz_dash` -- Dash parameters
+</div>  
 
 <div align="center">
   <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_integrity.png" width="80%" height="auto" alt="Monitoring_integrity">
-</div>   
+
 `quiz_dash` -- Integrity monitoring
+</div>  
 
 <div align="center">
   <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_quizzes.png" width="50%" height="auto" alt="Monitoring_activity">
-</div>   
+
 `quiz_dash` -- Monitoring of quizzes taken by students and the group. Automatic refresh possible and adjustable (student names have been hidden)
+</div>  
 
 <div align="center">
   <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_marks.png" width="80%" height="auto" alt="Monitoring_marks image">
-</div>   
-`quiz_dash` -- Automated correction, with the option to adjust the scoring system (automatic recalculation); (student names have been hidden). Of course, the results table can be downloaded.  
 
+`quiz_dash` -- Automated correction, with the option to adjust the scoring system (automatic recalculation); (student names have been hidden). Of course, the results table can be downloaded.  
+</div>  
 
 ## Typical Workflow
 
