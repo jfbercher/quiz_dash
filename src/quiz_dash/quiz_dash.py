@@ -53,6 +53,8 @@ def main():
         st.cache_data.clear()
         st.cache_resource.clear()
         st.session_state.clear()
+        set_defaults()
+        print("Global reset done")
 
 
     # --- 1. INITIAL RESTORATION (TEXTS ONLY) ---
