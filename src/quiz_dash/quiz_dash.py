@@ -330,6 +330,9 @@ def main():
             #for k in itemsInStorage:# + monitored_parameters + ['file_package']:
             #    local_storage.deleteItem(k)
             st.session_state.clear()
+            st.cache_data.clear()
+            st.cache_resource.clear()
+    
             set_defaults()
             print("Global reset done")
             st.rerun()
