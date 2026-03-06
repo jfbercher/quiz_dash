@@ -347,6 +347,7 @@ def main():
             st.rerun()'''
 
         if st.button("🗑️ Global reset", use_container_width=True, on_click=perform_global_reset):
+            pass
             #st.session_state["_reset_app"] = True
             #st.rerun()
 
