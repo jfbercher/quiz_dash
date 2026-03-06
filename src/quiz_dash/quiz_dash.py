@@ -45,6 +45,13 @@ def main():
 
     monitored_parameters = ["selected_lang", "url", "secret", "params_str", "maxtries",
                             "group", "seuil", "exam_title",  "bareme_str"]
+    
+    def perform_global_reset():
+        local_storage.deleteAll()
+        st.cache_data.clear()
+        st.cache_resource.clear()
+        st.session_state.clear()
+
 
     # --- 1. INITIAL RESTORATION (TEXTS ONLY) ---
     def set_defaults():
@@ -59,6 +66,10 @@ def main():
         st.session_state["exam_title"] = "" 
         st.session_state["params_str"] = "{'retries':2, 'exam_mode':False, 'test_mode':False}"
 
+    if st.session_state.get("_reset_app", False):
+        perform_global_reset()
+        st.session_state["_reset_app"] = False
+        st.rerun()
 
     if "_init" not in st.session_state:
         # Default values (replace value=...)
@@ -322,7 +333,7 @@ def main():
         st.divider()
 
         # Button Reset
-        if st.button("🗑️ Global reset", use_container_width=True):
+        z = '''if st.button("🗑️ Global reset", use_container_width=True):
             if '_init' in st.session_state:
                 del st.session_state["_init"]
             local_storage.deleteAll()
@@ -335,7 +346,12 @@ def main():
     
             set_defaults()
             print("Global reset done")
+            st.rerun()'''
+
+        if st.button("🗑️ Global reset", use_container_width=True):
+            st.session_state["_reset_app"] = True
             st.rerun()
+
 
     # --- MAIN AREA: SETTINGS ---
     st.title(_("📊 Monitoring & Correction Dashboard"))
