@@ -48,6 +48,8 @@ def main():
     
     def perform_global_reset():
         local_storage.deleteAll()
+        while len(local_storage.storedItems) > 0:
+            time.sleep(0.1)
         st.cache_data.clear()
         st.cache_resource.clear()
         st.session_state.clear()
@@ -66,11 +68,6 @@ def main():
         st.session_state["exam_title"] = "" 
         st.session_state["params_str"] = "{'retries':2, 'exam_mode':False, 'test_mode':False}"
 
-    if st.session_state.get("_reset_app", False):
-        perform_global_reset()
-        st.session_state["_reset_app"] = False
-        set_defaults()
-        st.rerun()
 
     if "_init" not in st.session_state:
         # Default values (replace value=...)
@@ -349,9 +346,9 @@ def main():
             print("Global reset done")
             st.rerun()'''
 
-        if st.button("🗑️ Global reset", use_container_width=True):
-            st.session_state["_reset_app"] = True
-            st.rerun()
+        if st.button("🗑️ Global reset", use_container_width=True, on_click=perform_global_reset):
+            #st.session_state["_reset_app"] = True
+            #st.rerun()
 
 
     # --- MAIN AREA: SETTINGS ---
