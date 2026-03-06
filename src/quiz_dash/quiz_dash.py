@@ -53,8 +53,10 @@ def main():
         st.cache_data.clear()
         st.cache_resource.clear()
         st.session_state.clear()
+        st.session_state.uploader_version = int(time.time())
         set_defaults()
         print("Global reset done")
+        st.rerun()
 
 
     # --- 1. INITIAL RESTORATION (TEXTS ONLY) ---
@@ -69,6 +71,21 @@ def main():
         st.session_state["seuil"] = 0.0 
         st.session_state["exam_title"] = "" 
         st.session_state["params_str"] = "{'retries':2, 'exam_mode':False, 'test_mode':False}"
+
+        # --- OTHER INITIALIZATION ---
+        if "df_results" not in st.session_state:
+            st.session_state.df_results = None
+        if "df_final" not in st.session_state:
+            st.session_state.df_final = None
+        st.session_state.show_scores = False
+        if "last_correction_update" not in st.session_state:
+            st.session_state.last_correction_update = None
+        if "refresh_key" not in st.session_state:
+            st.session_state.refresh_key = 0
+        if "uploader_version" not in st.session_state:
+            st.session_state.uploader_version = 0
+        if "last_processed_file" not in st.session_state:
+            st.session_state.last_processed_file = None
 
 
     if "_init" not in st.session_state:
@@ -86,12 +103,17 @@ def main():
         st.session_state["_init"] = True
 
     # --- 2. SYNCHRONISATION CALLBACK ---
+
     def sync(key):
         #print("Syncing", key)
-        if key not in st.session_state:
+        try: 
+            val = st.session_state[key] #st.session_state.get(key, None) #
+        except:
+            print("Syncing error for", key, "session state not present")
             return
-        val = st.session_state[key] #st.session_state.get(key, None) #
-        if key == "quiz_file":
+        if key.startswith("quiz_file_"):
+            st.session_state["quiz_file"] = val
+            if verbose: print(key, val)
             if val is not None:
                 content = val.getvalue()
                 compressed = zlib.compress(content)
@@ -281,17 +303,6 @@ def main():
     st.set_page_config(page_title=_("Dashboard LabQuiz"), layout="wide", 
                     page_icon="src/quiz_dash/1F4CA.png")#"📊")
 
-    # --- SESSION STATE INITIALIZATION ---
-    if "df_results" not in st.session_state:
-        st.session_state.df_results = None
-    if "df_final" not in st.session_state:
-        st.session_state.df_final = None
-    st.session_state.show_scores = False
-    if "last_correction_update" not in st.session_state:
-        st.session_state.last_correction_update = None
-    if "refresh_key" not in st.session_state:
-        st.session_state.refresh_key = 0
-
 
     # --- SIDEBAR: CONNECTION AND REFRESH RATE ---
     with st.sidebar:
@@ -306,10 +317,27 @@ def main():
              unsafe_allow_html=True
             )
         #st.caption(_("QUIZ file (YAML) containing corrections"))
-        uploaded_file = st.file_uploader("label", type=["yaml"], key="quiz_file", 
+        dynamic_key = f"quiz_file_{st.session_state.uploader_version}"
+        uploaded_file = st.file_uploader("label", type=["yaml"], key=dynamic_key, 
                                      label_visibility="collapsed",
-                                     on_change=sync, args=("quiz_file",))
+                                     #on_change=mark_upload, args=("quiz_file",)
+                                     )
+        
+        if uploaded_file is not None:
+            current_file_id = f"{uploaded_file.name}_{uploaded_file.size}"
+            if st.session_state.last_processed_file != current_file_id:
+                for key in st.session_state.keys():
+                    if key.startswith("quiz_file"):
+                        key_quiz = key
+                        print("key_quiz", key_quiz)
+                        break
+                sync(key_quiz)
+                st.session_state.last_processed_file = current_file_id
+        elif uploaded_file is None and st.session_state.last_processed_file is not None:
+            # Case where user deletes file manually (red cross)
+            st.session_state.last_processed_file = None
        
+
         quiz_file = uploaded_file if uploaded_file is not None else st.session_state.get("restored_file")
         st.divider()
         
