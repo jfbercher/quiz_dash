@@ -88,6 +88,8 @@ def main():
     # --- 2. SYNCHRONISATION CALLBACK ---
     def sync(key):
         #print("Syncing", key)
+        if key not in st.session_state:
+            return
         val = st.session_state[key] #st.session_state.get(key, None) #
         if key == "quiz_file":
             if val is not None:
@@ -110,9 +112,7 @@ def main():
             # Use json to store the value
             # print("stored", key, val)
             local_storage.setItem(key, json.dumps(val))
-            restored = local_storage.getItem(key)
-            newval = json.loads(restored)
-            # print("restored", key, newval)
+
 
     # --- 3. DYNAMIC FILE RESTORATION LOGIC ---
     # We check whether the widget is empty BUT we have a backup
