@@ -326,9 +326,10 @@ def main():
             if '_init' in st.session_state:
                 del st.session_state["_init"]
             local_storage.deleteAll()
-            #itemsInStorage = list(local_storage.storedItems.keys()).copy()
-            #for k in itemsInStorage:# + monitored_parameters + ['file_package']:
-            #    local_storage.deleteItem(k)
+            itemsInStorage = list(local_storage.storedItems.keys()).copy()
+            for k in itemsInStorage:# + monitored_parameters + ['file_package']:
+                print("Deleting", k)
+                local_storage.deleteItem(k)
             st.session_state.clear()
             st.cache_data.clear()
             st.cache_resource.clear()
