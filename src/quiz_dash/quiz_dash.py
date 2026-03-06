@@ -2,6 +2,13 @@ import streamlit as st
 import pandas as pd
 import time
 from streamlit_autorefresh import st_autorefresh
+from streamlit_local_storage import LocalStorage
+#from localStorage import LocalStorage
+import base64
+import zlib
+import io
+import json 
+
 import matplotlib.pyplot as plt
 # Labquiz functions import
 from labquiz.main import QuizLab
@@ -9,14 +16,120 @@ from labquiz.putils import (
     readData, 
     check_integrity_msg, 
     check_hash_integrity, 
-    correctQuizzesDf
-)
+    correctQuizzesDf)
+
+
+
 def main():
-
+    import streamlit as st
     from i18n import init_i18n, set_language, get_translator
-
-
     _ = init_i18n(default_lang="en")
+
+    verbose = False
+
+    # -------- Persistence  -----------------
+    storage_container = st.empty()
+
+    with storage_container:
+        local_storage = LocalStorage()
+    
+    newls = '''if "local_storage" not in st.session_state:
+        st.session_state.local_storage = LocalStorage(use_json=False)
+    local_storage = st.session_state.local_storage'''
+
+    old_setItem = local_storage.setItem
+    #local_storage.setItem = lambda key, value: old_setItem(key, json.dumps(value), key=key)
+    local_storage.setItem = lambda key, value: old_setItem(key, value, key=key+'_'+str(time.time()))
+    old_deleteItem = local_storage.deleteItem
+    local_storage.deleteItem = lambda key: old_deleteItem(key, key=key+'_'+str(time.time()))
+
+    monitored_parameters = ["selected_lang", "url", "secret", "params_str", "maxtries",
+                            "group", "seuil", "exam_title",  "bareme_str"]
+
+    # --- 1. INITIAL RESTORATION (TEXTS ONLY) ---
+    def set_defaults():
+        st.session_state["selected_lang"] = "en"
+        st.session_state["lang"] = "en"
+        st.session_state["url"] = ""
+        st.session_state["secret"] = ""
+        st.session_state["group"] = _('All')
+        st.session_state["bareme_str"] = "{}"
+        st.session_state["maxtries"] = 3
+        st.session_state["seuil"] = 0.0 
+        st.session_state["exam_title"] = "" 
+        st.session_state["params_str"] = "{'retries':2, 'exam_mode':False, 'test_mode':False}"
+
+
+    if "_init" not in st.session_state:
+        # Default values (replace value=...)
+        set_defaults()
+
+        # Restore the session state
+        for k in monitored_parameters:
+            stored = local_storage.getItem(k)
+            print(k, stored)
+            if stored:
+                st.session_state[k] = json.loads(stored)
+                # print("Restored", k, st.session_state[k])
+                pass
+        st.session_state["_init"] = True
+
+    # --- 2. SYNCHRONISATION CALLBACK ---
+    def sync(key):
+        #print("Syncing", key)
+        val = st.session_state[key] #st.session_state.get(key, None) #
+        if key == "quiz_file":
+            if val is not None:
+                content = val.getvalue()
+                compressed = zlib.compress(content)
+                encoded = base64.b64encode(compressed).decode()
+                file_data = {
+                    "name": val.name,
+                    "b64": encoded
+                }
+                local_storage.setItem("file_package", json.dumps(file_data))
+                # Empty the restored object to force use of the new widget
+                st.session_state.pop("restored_file", None)
+            else:
+                # The user clicked on the widget cross
+                local_storage.deleteItem("file_package")
+                st.session_state.pop("restored_file", None)
+        else:
+            # Any other widget
+            # Use json to store the value
+            # print("stored", key, val)
+            local_storage.setItem(key, json.dumps(val))
+            restored = local_storage.getItem(key)
+            newval = json.loads(restored)
+            # print("restored", key, newval)
+
+    # --- 3. DYNAMIC FILE RESTORATION LOGIC ---
+    # We check whether the widget is empty BUT we have a backup
+    
+    package_json = local_storage.getItem("file_package")
+    #print("file_package", package_json)
+    #package_json = False
+
+    if st.session_state.get("quiz_file") is None and package_json:
+        # If the restored object is not already in memory, we recreate it
+            if "restored_file" not in st.session_state:
+                try:
+                    package = json.loads(package_json)
+                    # On extrait les deux infos du dictionnaire unique
+                    raw_bytes = zlib.decompress(base64.b64decode(package["b64"]))
+                
+                    restored_file = io.BytesIO(raw_bytes)
+                    restored_file.name = package["name"] # Le nom est ici !
+                    restored_file.size = len(raw_bytes)
+                    restored_file.seek(0)
+                    st.session_state["restored_file"] = restored_file
+                except Exception as e:
+                        st.error(f"Restoration error: {e}")
+    else:
+        # If the widget is filled, we make sure not to use the old restored file
+        st.session_state.pop("restored_file", None)
+    # -------- End persistence --------------
+
 
     # Language selection
     #lang = st.sidebar.selectbox("Language", ["🇬🇧 en", "🇫🇷 fr"], index=["en", "fr"].index(st.session_state.lang))
@@ -26,12 +139,14 @@ def main():
         "es": "🇪🇸 Spanish",
     }
 
+
     lang = st.sidebar.selectbox(
         "Language",
         options=list(languages.keys()),
         format_func=lambda x: languages[x],
         index=list(languages.keys()).index(st.session_state.lang),
         key = "selected_lang",
+        on_change=sync, args=("selected_lang",)
     )
 
     if lang != st.session_state.lang:
@@ -65,12 +180,12 @@ def main():
     @st.cache_data(show_spinner=False)
     def adhocReadData(url, secret, autorefresh, button_refresh):
         import time
-        print("Reading data...")
+        if verbose:print("Reading data...")
         time.sleep(0)
         tic = time.perf_counter()
         df, df_filt = readData(url, secret)
         toc = time.perf_counter()
-        print(f"Reading data execution time: {toc-tic:.3f} seconde(s)")
+        if verbose: print(f"Reading data execution time: {toc-tic:.3f} seconde(s)")
         return df, df_filt
     
     # To raise the widget vertically a little (fragile)
@@ -85,6 +200,69 @@ def main():
         margin-bottom: 0.3rem;
     }
     </style>
+    """, unsafe_allow_html=True)
+
+    import streamlit as st
+
+    # Remove sidebar header
+    st.markdown("""
+    <style>
+    [data-testid="stLogoSpacer"] {
+        display: none;
+    }
+
+    [data-testid="stSidebarHeader"] {
+        height: auto;
+        padding-top: 0rem;
+        padding-bottom: 0rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Remove main area header
+    st.markdown("""
+    <style>
+    .block-container {
+        padding-top: 0rem;
+        margin-top: -1rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    ww = '''# streamlit_local_storage adds a useless iframe
+    st.markdown("""
+    <style>
+    div:has(> iframe[title="streamlit_local_storage.st_local_storage"]) {
+        height: 0px !important;
+        min-height: 0px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)'''
+
+    st.markdown("""
+        <style>
+            /* 1. On cible l'iframe spécifique par son titre */
+            iframe[title="streamlit_local_storage.st_local_storage"] {
+                display: none !important;
+                height: 0px !important;
+                width: 0px !important;
+                visibility: hidden !important;
+            }
+
+            /* 2. On remonte au parent pour supprimer l'espace réservé (le slot) */
+            div[data-testid="stElementContainer"]:has(iframe[title="streamlit_local_storage.st_local_storage"]) {
+                display: none !important;
+                margin-bottom: 0px !important;
+                padding: 0px !important;
+            }
+            
+            /* 3. Sécurité supplémentaire pour les versions récentes de Streamlit */
+            div.element-container:has(iframe[title="streamlit_local_storage.st_local_storage"]) {
+                display: none !important;
+            }
+        </style>
     """, unsafe_allow_html=True)
 
 
@@ -107,16 +285,21 @@ def main():
     # --- SIDEBAR: CONNECTION AND REFRESH RATE ---
     with st.sidebar:
         st.header(_("🔑 Connection"))
-        url = st.text_input(_("Google Sheet URL"), placeholder="https://docs.google.com/...", key="url")
-        secret = st.text_input(_("Secret Key"), type="password", key="secret")
+        url = st.text_input(_("Google Sheet URL"), placeholder="https://docs.google.com/...", 
+                            key="url", on_change=sync, args=("url",))
+        secret = st.text_input(_("Secret Key"), type="password", key="secret",
+                               on_change=sync, args=("secret",))
         label =_('QUIZ file (YAML) containing corrections')
         st.markdown(
             f"<span style='font-size:0.8rem; color: black;'>{label}</span>",
              unsafe_allow_html=True
             )
         #st.caption(_("QUIZ file (YAML) containing corrections"))
-        quiz_file = st.file_uploader("label", type=["yaml"], key="quiz_file", 
-                                     label_visibility="collapsed")
+        uploaded_file = st.file_uploader("label", type=["yaml"], key="quiz_file", 
+                                     label_visibility="collapsed",
+                                     on_change=sync, args=("quiz_file",))
+       
+        quiz_file = uploaded_file if uploaded_file is not None else st.session_state.get("restored_file")
         st.divider()
         
         #st.header(_("⏱️ Monitoring"))
@@ -136,6 +319,21 @@ def main():
                 key="datarefresh"
             )
 
+        st.divider()
+
+        # Button Reset
+        if st.button("🗑️ Global reset", use_container_width=True):
+            if '_init' in st.session_state:
+                del st.session_state["_init"]
+            local_storage.deleteAll()
+            #itemsInStorage = list(local_storage.storedItems.keys()).copy()
+            #for k in itemsInStorage:# + monitored_parameters + ['file_package']:
+            #    local_storage.deleteItem(k)
+            st.session_state.clear()
+            set_defaults()
+            print("Global reset done")
+            st.rerun()
+
     # --- MAIN AREA: SETTINGS ---
     st.title(_("📊 Monitoring & Correction Dashboard"))
 
@@ -144,13 +342,21 @@ def main():
         
         with col_p1:
             st.markdown(_("**Monitoring & Source**"))
-            params_str = st.text_input(_("Parameters to monitor (e.g.: {'retries':2, 'exam_mode':False, 'test_mode':False})"), value="{'retries':2, 'exam_mode':False, 'test_mode':False}", key="params_str")
-            maxtries = st.number_input(_("Number of allowed attempts"), min_value=1, value=3, key="maxtries")
+            params_str = st.text_input(_("Parameters to monitor (e.g.: {'retries':2, 'exam_mode':False, 'test_mode':False})"), 
+                                       #value="{'retries':2, 'exam_mode':False, 'test_mode':False}", 
+                                       key="params_str", on_change=sync, args=("params_str",))
+            maxtries = st.number_input(_("Number of allowed attempts"), min_value=1, 
+                                       #value=3, 
+                                       key="maxtries", on_change=sync, args=("maxtries",))
             
         with col_p2:
             st.markdown(_("**Grading Algorithm**"))
-            seuil = st.number_input(_("Threshold (0 to avoid negative marks)"), value=0.0, key="seuil")
-            exam_title = st.text_input(_("Exam title (if randomized)"), value="", key="exam_title")
+            seuil = st.number_input(_("Threshold (0 to avoid negative marks)"), 
+                                    #value=0.0, 
+                                    key="seuil", on_change=sync, args=("seuil",))
+            exam_title = st.text_input(_("Exam title (if randomized)"), 
+                                       #value="", 
+                                       key="exam_title", on_change=sync, args=("exam_title",))
 
         st.divider()
         col_p3, col_p4 = st.columns(2)
@@ -163,7 +369,7 @@ def main():
                 _("FP (False Positive)"): -1.0,
                 _("FN (False Negative)"): 0.0,
                 _("TN (True Negative)"): 0.0
-            }, key="weights_editor")
+            }, key="weights_editor",  args=("weights_editor",))
             
             # Conversion for correctQuizzesDf function
             final_weights = {
@@ -175,7 +381,9 @@ def main():
 
         with col_p4:
             st.markdown(_("**Grading scale per question**"))
-            bareme_str = st.text_area(_("Scale dictionary (e.g.: {'q1': 2})"), value="{}", key="bareme_str")
+            bareme_str = st.text_area(_("Scale dictionary (e.g.: {'q1': 2})"), 
+                                      #value="{}", 
+                                      key="bareme_str", on_change=sync, args=("bareme_str",)) #key="bareme_str")
 
 
     # --- DATA PROCESSING ---
@@ -186,8 +394,13 @@ def main():
         try:
             import copy
             # 1. Reading
+            read_error = False
             with st.spinner(_("Reading data...")):
                 full_df, full_df_filt = adhocReadData(url, secret, refresh_count, st.session_state.refresh_key)
+                if full_df is None or full_df_filt is None:
+                    st.error(_("Data could not be read."))
+                    read_error = True
+            if read_error: st.stop()
             full_df = generate_cols_from_student(full_df, dropStudent=False)
             full_df_filt = generate_cols_from_student(full_df_filt, dropStudent=False)
             # Group selection
@@ -207,6 +420,7 @@ def main():
                     with cola:
                         st.subheader(_("**Class/Group selection**")) 
                         group = st.selectbox(_("Class/Group"), groups, key="group", 
+                                             on_change=sync, args=("group",),
                                              label_visibility="collapsed")
                     
                 
@@ -229,7 +443,6 @@ def main():
             wanted_hash = get_full_object_hash(quiz, modules=['main', 'utils'], 
                                                 WATCHLIST=['retries', 'exam_mode', 'test_mode'])
 
-
             # 3. Global integrity check (hash)
             # wanted_hash = # To be defined! st.secrets["hash"]
             # check_hash_integrity(df, 'full', wanted_hash=wanted_hash) # Will display in terminal or via st if modified
@@ -246,7 +459,6 @@ def main():
                 #                        label_visibility="collapsed",
                 #                        key="active_tab")
                 tab_mon, tab_mon_graph, tab_corr = st.tabs(tab_names)
-
                 with tab_mon:
                 #if selected_tab == _("📡 Integrity Live"):
                     from labquiz.putils import make_anomalies_df_report, group_anomalies_per_student
@@ -464,7 +676,6 @@ def main():
                             st.info(_("Scores per question available. Click Recalculate to see final marks."))
                         else:
                             st.caption(_("Waiting for correction to start."))
-                        
 
         except Exception as e:
             st.error(_('Error during reading or processing: ') + f"{e}")
