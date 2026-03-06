@@ -69,6 +69,7 @@ def main():
     if st.session_state.get("_reset_app", False):
         perform_global_reset()
         st.session_state["_reset_app"] = False
+        set_defaults()
         st.rerun()
 
     if "_init" not in st.session_state:
@@ -78,7 +79,7 @@ def main():
         # Restore the session state
         for k in monitored_parameters:
             stored = local_storage.getItem(k)
-            print(k, stored)
+            if verbose: print(k, stored)
             if stored:
                 st.session_state[k] = json.loads(stored)
                 # print("Restored", k, st.session_state[k])
