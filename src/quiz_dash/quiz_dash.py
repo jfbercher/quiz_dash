@@ -86,6 +86,9 @@ def main():
             st.session_state.uploader_version = 0
         if "last_processed_file" not in st.session_state:
             st.session_state.last_processed_file = None
+        if 'tabs_placeholder' not in st.session_state:
+            st.session_state.tabs_placeholder = st.empty()
+
 
 
     if "_init" not in st.session_state:
@@ -329,7 +332,6 @@ def main():
                 for key in st.session_state.keys():
                     if key.startswith("quiz_file"):
                         key_quiz = key
-                        print("key_quiz", key_quiz)
                         break
                 sync(key_quiz)
                 st.session_state.last_processed_file = current_file_id
@@ -361,21 +363,6 @@ def main():
         st.divider()
 
         # Button Reset
-        z = '''if st.button("🗑️ Global reset", use_container_width=True):
-            if '_init' in st.session_state:
-                del st.session_state["_init"]
-            local_storage.deleteAll()
-            #itemsInStorage = list(local_storage.storedItems.keys()).copy()
-            #for k in itemsInStorage:# + monitored_parameters + ['file_package']:
-            #    local_storage.deleteItem(k)
-            st.session_state.clear()
-            st.cache_data.clear()
-            st.cache_resource.clear()
-    
-            set_defaults()
-            print("Global reset done")
-            st.rerun()'''
-
         if st.button("🗑️ Global reset", use_container_width=True, on_click=perform_global_reset):
             pass
             #st.session_state["_reset_app"] = True
@@ -436,7 +423,7 @@ def main():
 
     # --- DATA PROCESSING ---
     group_placeholder = st.container()
-    placeholder = st.container()
+    tabs_placeholder = st.container()
 
     if url and secret and quiz_file:
         try:
@@ -466,7 +453,7 @@ def main():
                 with group_placeholder:
                     cola, colb = st.columns([3, 5])
                     with cola:
-                        st.subheader(_("**Class/Group selection**")) 
+                        st.markdown(_("**Class/Group selection**")) 
                         group = st.selectbox(_("Class/Group"), groups, key="group", 
                                              on_change=sync, args=("group",),
                                              label_visibility="collapsed")
@@ -499,16 +486,24 @@ def main():
             students_raw = sorted(list(df["student"].dropna().unique()))
             students = [s for s in students_raw]
 
-            # --- TABS ---
-            with placeholder:
+            with tabs_placeholder.container(border=True): 
+                st.markdown(f"### 🛠️ {_('Live monitoring & Correction')}")
                 tab_names = [_("📡 Integrity Live"), _("Monitoring"), _("🎯 Correction & Grades")]
                 #selected_tab = st.radio(_("Select a tab"), 
                 #                        tab_names, horizontal=True, 
                 #                        label_visibility="collapsed",
                 #                        key="active_tab")
-                tab_mon, tab_mon_graph, tab_corr = st.tabs(tab_names)
-                with tab_mon:
-                #if selected_tab == _("📡 Integrity Live"):
+                #tab_mon, tab_mon_graph, tab_corr = st.tabs(tab_names)
+                selected_tab = st.segmented_control(
+                    label="Navigation",
+                    options=tab_names,
+                    default=tab_names[0],
+                    key="main_nav_state", 
+                    label_visibility="collapsed" 
+                )
+                st.divider() # Un petit trait pour séparer proprement du contenu
+                #with tab_mon:
+                if selected_tab == _("📡 Integrity Live"):
                     from labquiz.putils import make_anomalies_df_report, group_anomalies_per_student
 
                     st.subheader(_("Real-time integrity monitoring"))
@@ -543,8 +538,8 @@ def main():
                     else:
                         st.dataframe(Tab_report, width='stretch', hide_index=True)
 
-                #elif selected_tab == _("Monitoring"): 
-                with tab_mon_graph:
+                elif selected_tab == _("Monitoring"): 
+                #with tab_mon_graph:
                     st.subheader(_("Activity monitoring"))
                     
                     df = df.copy()
@@ -641,8 +636,8 @@ def main():
                             'quizzes_list': st.column_config.TextColumn(width='auto')
                             }
                         )
-                #elif selected_tab == _("🎯 Correction & Grades"):
-                with tab_corr:
+                elif selected_tab == _("🎯 Correction & Grades"):
+                #with tab_corr:
                     st.subheader(_("Correction & Grades"))
                     col_res1, col_res2 = st.columns([99, 1])
                     b_dict = {}
