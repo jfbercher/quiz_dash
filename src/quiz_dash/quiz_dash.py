@@ -306,6 +306,10 @@ def main():
     st.set_page_config(page_title=_("Dashboard LabQuiz"), layout="wide", 
                     page_icon="src/quiz_dash/1F4CA.png")#"📊")
 
+    parameters_placeholder = st.container()
+    group_placeholder = st.container()
+    tabs_placeholder = st.empty()
+
 
     # --- SIDEBAR: CONNECTION AND REFRESH RATE ---
     with st.sidebar:
@@ -370,60 +374,59 @@ def main():
 
 
     # --- MAIN AREA: SETTINGS ---
-    st.title(_("📊 Monitoring & Correction Dashboard"))
+    with parameters_placeholder:
+        st.title(_("📊 Monitoring & Correction Dashboard"))
 
-    with st.expander(_("🛠️ Parameter Configuration (Integrity & Correction)"), expanded=True):
-        col_p1, col_p2 = st.columns(2)
-        
-        with col_p1:
-            st.markdown(_("**Monitoring & Source**"))
-            params_str = st.text_input(_("Parameters to monitor (e.g.: {'retries':2, 'exam_mode':False, 'test_mode':False})"), 
-                                       #value="{'retries':2, 'exam_mode':False, 'test_mode':False}", 
-                                       key="params_str", on_change=sync, args=("params_str",))
-            maxtries = st.number_input(_("Number of allowed attempts"), min_value=1, 
-                                       #value=3, 
-                                       key="maxtries", on_change=sync, args=("maxtries",))
+        with st.expander(_("🛠️ Parameter Configuration (Integrity & Correction)"), expanded=True):
+            col_p1, col_p2 = st.columns(2)
             
-        with col_p2:
-            st.markdown(_("**Grading Algorithm**"))
-            seuil = st.number_input(_("Threshold (0 to avoid negative marks)"), 
-                                    #value=0.0, 
-                                    key="seuil", on_change=sync, args=("seuil",))
-            exam_title = st.text_input(_("Exam title (if randomized)"), 
-                                       #value="", 
-                                       key="exam_title", on_change=sync, args=("exam_title",))
+            with col_p1:
+                st.markdown(_("**Monitoring & Source**"))
+                params_str = st.text_input(_("Parameters to monitor (e.g.: {'retries':2, 'exam_mode':False, 'test_mode':False})"), 
+                                        #value="{'retries':2, 'exam_mode':False, 'test_mode':False}", 
+                                        key="params_str", on_change=sync, args=("params_str",))
+                maxtries = st.number_input(_("Number of allowed attempts"), min_value=1, 
+                                        #value=3, 
+                                        key="maxtries", on_change=sync, args=("maxtries",))
+                
+            with col_p2:
+                st.markdown(_("**Grading Algorithm**"))
+                seuil = st.number_input(_("Threshold (0 to avoid negative marks)"), 
+                                        #value=0.0, 
+                                        key="seuil", on_change=sync, args=("seuil",))
+                exam_title = st.text_input(_("Exam title (if randomized)"), 
+                                        #value="", 
+                                        key="exam_title", on_change=sync, args=("exam_title",))
 
-        st.divider()
-        col_p3, col_p4 = st.columns(2)
-        
-        with col_p3:
-            st.markdown(_("**Weights Matrix**"))
-            # Dictionary editor for base weights
-            weights_dict = st.data_editor({
-                _("TP (True Positive)"): 1.0,
-                _("FP (False Positive)"): -1.0,
-                _("FN (False Negative)"): 0.0,
-                _("TN (True Negative)"): 0.0
-            }, key="weights_editor",  args=("weights_editor",))
+            st.divider()
+            col_p3, col_p4 = st.columns(2)
             
-            # Conversion for correctQuizzesDf function
-            final_weights = {
-                (True, True): weights_dict[_("TP (True Positive)")],
-                (True, False): weights_dict[_("FP (False Positive)")],
-                (False, True): weights_dict[_("FN (False Negative)")],
-                (False, False): weights_dict[_("TN (True Negative)")]
-            }
+            with col_p3:
+                st.markdown(_("**Weights Matrix**"))
+                # Dictionary editor for base weights
+                weights_dict = st.data_editor({
+                    _("TP (True Positive)"): 1.0,
+                    _("FP (False Positive)"): -1.0,
+                    _("FN (False Negative)"): 0.0,
+                    _("TN (True Negative)"): 0.0
+                }, key="weights_editor",  args=("weights_editor",))
+                
+                # Conversion for correctQuizzesDf function
+                final_weights = {
+                    (True, True): weights_dict[_("TP (True Positive)")],
+                    (True, False): weights_dict[_("FP (False Positive)")],
+                    (False, True): weights_dict[_("FN (False Negative)")],
+                    (False, False): weights_dict[_("TN (True Negative)")]
+                }
 
-        with col_p4:
-            st.markdown(_("**Grading scale per question**"))
-            bareme_str = st.text_area(_("Scale dictionary (e.g.: {'q1': 2})"), 
-                                      #value="{}", 
-                                      key="bareme_str", on_change=sync, args=("bareme_str",)) #key="bareme_str")
+            with col_p4:
+                st.markdown(_("**Grading scale per question**"))
+                bareme_str = st.text_area(_("Scale dictionary (e.g.: {'q1': 2})"), 
+                                        #value="{}", 
+                                        key="bareme_str", on_change=sync, args=("bareme_str",)) #key="bareme_str")
 
 
     # --- DATA PROCESSING ---
-    group_placeholder = st.container()
-    tabs_placeholder = st.empty()
 
     if url and secret and quiz_file:
         try:
