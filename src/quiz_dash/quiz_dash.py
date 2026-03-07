@@ -18,35 +18,82 @@ from labquiz.putils import (
     check_hash_integrity, 
     correctQuizzesDf)
 
+# Global variable initialization
+local_storage = None
+# Others
+verbose = False
+
+from i18n import init_i18n, set_language, get_translator
+_ = init_i18n(default_lang="en")
 
 
-def main():
-    import streamlit as st
-    from i18n import init_i18n, set_language, get_translator
-    _ = init_i18n(default_lang="en")
+# --- 1. INITIAL RESTORATION (TEXTS ONLY) ---
+def set_defaults():
+    global _
+    st.session_state["selected_lang"] = "en"
+    st.session_state["lang"] = "en"
+    st.session_state["url"] = ""
+    st.session_state["secret"] = ""
+    st.session_state["group"] = _('All')
+    st.session_state["bareme_str"] = "{}"
+    st.session_state["maxtries"] = 3
+    st.session_state["seuil"] = 0.0 
+    st.session_state["exam_title"] = "" 
+    st.session_state["params_str"] = "{'retries':2, 'exam_mode':False, 'test_mode':False}"
 
-    verbose = False
+    # --- OTHER INITIALIZATION ---
+    if "df_results" not in st.session_state:
+        st.session_state.df_results = None
+    if "df_final" not in st.session_state:
+        st.session_state.df_final = None
+    st.session_state.show_scores = False
+    if "last_correction_update" not in st.session_state:
+        st.session_state.last_correction_update = None
+    if "refresh_key" not in st.session_state:
+        st.session_state.refresh_key = 0
+    if "uploader_version" not in st.session_state:
+        st.session_state.uploader_version = 0
+    if "last_processed_file" not in st.session_state:
+        st.session_state.last_processed_file = None
+    if 'tabs_placeholder' not in st.session_state:
+        st.session_state.tabs_placeholder = st.empty()
 
-    # -------- Persistence  -----------------
-    storage_container = st.empty()
+def sync(key):
+    global local_storage 
+    global _
+    if local_storage is None:
+        return # Security if local_storage is not ready yet
+    try: 
+        val = st.session_state[key] #st.session_state.get(key, None) #
+    except:
+        print("Syncing error for", key, "session state not present")
+        return
+    if key.startswith("quiz_file_"):
+        st.session_state["quiz_file"] = val
+        if verbose: print(key, val)
+        if val is not None:
+            content = val.getvalue()
+            compressed = zlib.compress(content)
+            encoded = base64.b64encode(compressed).decode()
+            file_data = {
+                "name": val.name,
+                "b64": encoded
+            }
+            local_storage.setItem("file_package", json.dumps(file_data))
+            # Empty the restored object to force use of the new widget
+            st.session_state.pop("restored_file", None)
+        else:
+            # The user clicked on the widget cross
+            local_storage.deleteItem("file_package")
+            st.session_state.pop("restored_file", None)
+    else:
+        # Any other widget
+        # Use json to store the value
+        # print("stored", key, val)
+        local_storage.setItem(key, json.dumps(val))
 
-    with storage_container:
-        local_storage = LocalStorage()
-    
-    newls = '''if "local_storage" not in st.session_state:
-        st.session_state.local_storage = LocalStorage(use_json=False)
-    local_storage = st.session_state.local_storage'''
-
-    old_setItem = local_storage.setItem
-    #local_storage.setItem = lambda key, value: old_setItem(key, json.dumps(value), key=key)
-    local_storage.setItem = lambda key, value: old_setItem(key, value, key=key+'_'+str(time.time()))
-    old_deleteItem = local_storage.deleteItem
-    local_storage.deleteItem = lambda key: old_deleteItem(key, key=key+'_'+str(time.time()))
-
-    monitored_parameters = ["selected_lang", "url", "secret", "params_str", "maxtries",
-                            "group", "seuil", "exam_title",  "bareme_str"]
-    
-    def perform_global_reset():
+def perform_global_reset():
+        global local_storage
         local_storage.deleteAll()
         while len(local_storage.storedItems) > 0:
             time.sleep(0.1)
@@ -59,37 +106,121 @@ def main():
         st.rerun()
 
 
-    # --- 1. INITIAL RESTORATION (TEXTS ONLY) ---
-    def set_defaults():
-        st.session_state["selected_lang"] = "en"
-        st.session_state["lang"] = "en"
-        st.session_state["url"] = ""
-        st.session_state["secret"] = ""
-        st.session_state["group"] = _('All')
-        st.session_state["bareme_str"] = "{}"
-        st.session_state["maxtries"] = 3
-        st.session_state["seuil"] = 0.0 
-        st.session_state["exam_title"] = "" 
-        st.session_state["params_str"] = "{'retries':2, 'exam_mode':False, 'test_mode':False}"
+@st.cache_data(show_spinner=False)
+def adhocReadData(url, secret, autorefresh, button_refresh):
+    import time
+    if verbose:print("Reading data...")
+    time.sleep(0)
+    tic = time.perf_counter()
+    df, df_filt = readData(url, secret)
+    toc = time.perf_counter()
+    if verbose: print(f"Reading data execution time: {toc-tic:.3f} seconde(s)")
+    return df, df_filt
 
-        # --- OTHER INITIALIZATION ---
-        if "df_results" not in st.session_state:
-            st.session_state.df_results = None
-        if "df_final" not in st.session_state:
-            st.session_state.df_final = None
-        st.session_state.show_scores = False
-        if "last_correction_update" not in st.session_state:
-            st.session_state.last_correction_update = None
-        if "refresh_key" not in st.session_state:
-            st.session_state.refresh_key = 0
-        if "uploader_version" not in st.session_state:
-            st.session_state.uploader_version = 0
-        if "last_processed_file" not in st.session_state:
-            st.session_state.last_processed_file = None
-        if 'tabs_placeholder' not in st.session_state:
-            st.session_state.tabs_placeholder = st.empty()
+def generate_cols_from_student(df, dropStudent=False):
+    split_cols = df['student'].str.split(r'\s*,\s*', expand=True)
+    split_cols.columns = ['name', 'firstname', 'class_group'][:split_cols.shape[1]]
+    newdf = pd.concat([split_cols, df], axis=1)
+    if dropStudent: newdf = newdf.drop(columns='student')
+    return newdf
 
+def recompute_score(adj_bareme, questions, exam_title, df_results, full_df, full_df_filt, quiz, seuil, final_weights, maxtries):
+    coeffs = adj_bareme.loc["Coefficient"]
+    res_copy = df_results.copy()
+    
+    if exam_title == "":
+        # Scalar product
+        res_copy["FinalMark"] = res_copy[questions].dot(coeffs) * (20 / sum(coeffs))
+    else:
+        # Complete calcul
+        res_copy = correctQuizzesDf(
+            data=full_df, data_filt=full_df_filt, quiz=quiz, 
+            title=exam_title, seuil=seuil, weights=final_weights, 
+            bareme=coeffs, maxtries=maxtries
+        )
+        res_copy["FinalMark"] = res_copy["Note"]
+        res_copy.drop(columns='Note', inplace=True, errors='ignore')
+        res_copy = generate_cols_from_student(res_copy, dropStudent=False)
+    
+    return res_copy
 
+def apply_custom_styles():
+
+    custom_css ="""
+    <style>
+    /* To raise the widget vertically a little (fragile)
+    # and reduce vertical space around divider */
+    section[data-testid="stSidebar"] div[data-testid="stFileUploader"] {
+        margin-top: -0.85rem;
+    }
+    div[data-testid="stMarkdownContainer"] hr {
+        margin-top: 0.3rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    /*Remove sidebar header*/
+
+    [data-testid="stLogoSpacer"] {
+        display: none;
+    }
+
+    [data-testid="stSidebarHeader"] {
+        height: auto;
+        padding-top: 0rem;
+        padding-bottom: 0rem;
+    }
+    
+    /* Remove main area header */
+    .block-container {
+        padding-top: 0rem;
+        margin-top: 1rem;
+    }
+    
+    /* don't display streamlit_local_storage iframes */
+
+    /* 1. Target the specific iframe by its title */
+    iframe[title="streamlit_local_storage.st_local_storage"] {
+        display: none !important;
+        height: 0px !important;
+        width: 0px !important;
+        visibility: hidden !important;
+    }
+
+    /* 2. Go back to the parent to delete the reserved space (the slot) */
+    div[data-testid="stElementContainer"]:has(iframe[title="streamlit_local_storage.st_local_storage"]) {
+        display: none !important;
+        margin-bottom: 0px !important;
+        padding: 0px !important;
+    }
+    
+    /* 3. Additional Security for Recent Streamlit Versions */
+    div.element-container:has(iframe[title="streamlit_local_storage.st_local_storage"]) {
+        display: none !important;
+    }
+    </style>
+    """
+    st.markdown(custom_css, unsafe_allow_html=True)
+
+def main():
+    import streamlit as st
+    global _
+    global local_storage #
+    
+    # This is to stabilize the iframe, in the rendering flow
+    storage_container = st.empty()
+    with storage_container:
+        local_storage = LocalStorage()
+    
+
+    old_setItem = local_storage.setItem
+    #local_storage.setItem = lambda key, value: old_setItem(key, json.dumps(value), key=key)
+    local_storage.setItem = lambda key, value: old_setItem(key, value, key=key+'_'+str(time.time()))
+    old_deleteItem = local_storage.deleteItem
+    local_storage.deleteItem = lambda key: old_deleteItem(key, key=key+'_'+str(time.time()))
+
+    monitored_parameters = ["selected_lang", "url", "secret", "params_str", "maxtries",
+                            "group", "seuil", "exam_title",  "bareme_str"]
+    
 
     if "_init" not in st.session_state:
         # Default values (replace value=...)
@@ -105,40 +236,7 @@ def main():
                 pass
         st.session_state["_init"] = True
 
-    # --- 2. SYNCHRONISATION CALLBACK ---
-
-    def sync(key):
-        #print("Syncing", key)
-        try: 
-            val = st.session_state[key] #st.session_state.get(key, None) #
-        except:
-            print("Syncing error for", key, "session state not present")
-            return
-        if key.startswith("quiz_file_"):
-            st.session_state["quiz_file"] = val
-            if verbose: print(key, val)
-            if val is not None:
-                content = val.getvalue()
-                compressed = zlib.compress(content)
-                encoded = base64.b64encode(compressed).decode()
-                file_data = {
-                    "name": val.name,
-                    "b64": encoded
-                }
-                local_storage.setItem("file_package", json.dumps(file_data))
-                # Empty the restored object to force use of the new widget
-                st.session_state.pop("restored_file", None)
-            else:
-                # The user clicked on the widget cross
-                local_storage.deleteItem("file_package")
-                st.session_state.pop("restored_file", None)
-        else:
-            # Any other widget
-            # Use json to store the value
-            # print("stored", key, val)
-            local_storage.setItem(key, json.dumps(val))
-
-
+    
     # --- 3. DYNAMIC FILE RESTORATION LOGIC ---
     # We check whether the widget is empty BUT we have a backup
     
@@ -175,7 +273,6 @@ def main():
         "es": "🇪🇸 Spanish",
     }
 
-
     lang = st.sidebar.selectbox(
         "Language",
         options=list(languages.keys()),
@@ -190,121 +287,14 @@ def main():
         _ = set_language(lang)
         #st.rerun()
 
-    def generate_cols_from_student(df, dropStudent=False):
-        split_cols = df['student'].str.split(r'\s*,\s*', expand=True)
-        split_cols.columns = ['name', 'firstname', 'class_group'][:split_cols.shape[1]]
-        newdf = pd.concat([split_cols, df], axis=1)
-        if dropStudent: newdf = newdf.drop(columns='student')
-        return newdf
-                    
-    def recompute_score():
-        coeffs = adj_bareme.loc["Coefficient"] #dict
-        res_copy = st.session_state.df_results.copy() # results of the selected group
-        if exam_title == "":
-            # simple scalar product
-            res_copy["FinalMark"] = res_copy[questions].dot(coeffs)*(20/sum(coeffs))
-        else:
-            res_copy = correctQuizzesDf(data=df, data_filt=df_filt, quiz=quiz, 
-                    title=exam_title, seuil=seuil, weights=final_weights, 
-                    bareme=coeffs, maxtries=maxtries)
-            res_copy["FinalMark"] = res_copy["Note"]
-            res_copy.drop(columns='Note', inplace=True, errors='ignore')
-            res_copy = generate_cols_from_student(res_copy, dropStudent=False)
-        st.session_state.df_results = res_copy
-        st.session_state.show_scores = True
-
-    @st.cache_data(show_spinner=False)
-    def adhocReadData(url, secret, autorefresh, button_refresh):
-        import time
-        if verbose:print("Reading data...")
-        time.sleep(0)
-        tic = time.perf_counter()
-        df, df_filt = readData(url, secret)
-        toc = time.perf_counter()
-        if verbose: print(f"Reading data execution time: {toc-tic:.3f} seconde(s)")
-        return df, df_filt
     
-    # To raise the widget vertically a little (fragile)
-    # and reduce vertical space around divider 
-    st.markdown("""
-    <style>
-    section[data-testid="stSidebar"] div[data-testid="stFileUploader"] {
-        margin-top: -0.85rem;
-    }
-    div[data-testid="stMarkdownContainer"] hr {
-        margin-top: 0.3rem;
-        margin-bottom: 0.3rem;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    import streamlit as st
-
-    # Remove sidebar header
-    st.markdown("""
-    <style>
-    [data-testid="stLogoSpacer"] {
-        display: none;
-    }
-
-    [data-testid="stSidebarHeader"] {
-        height: auto;
-        padding-top: 0rem;
-        padding-bottom: 0rem;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # Remove main area header
-    st.markdown("""
-    <style>
-    .block-container {
-        padding-top: 0rem;
-        margin-top: -1rem;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    ww = '''# streamlit_local_storage adds a useless iframe
-    st.markdown("""
-    <style>
-    div:has(> iframe[title="streamlit_local_storage.st_local_storage"]) {
-        height: 0px !important;
-        min-height: 0px !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)'''
-
-    st.markdown("""
-        <style>
-            /* 1. On cible l'iframe spécifique par son titre */
-            iframe[title="streamlit_local_storage.st_local_storage"] {
-                display: none !important;
-                height: 0px !important;
-                width: 0px !important;
-                visibility: hidden !important;
-            }
-
-            /* 2. On remonte au parent pour supprimer l'espace réservé (le slot) */
-            div[data-testid="stElementContainer"]:has(iframe[title="streamlit_local_storage.st_local_storage"]) {
-                display: none !important;
-                margin-bottom: 0px !important;
-                padding: 0px !important;
-            }
-            
-            /* 3. Sécurité supplémentaire pour les versions récentes de Streamlit */
-            div.element-container:has(iframe[title="streamlit_local_storage.st_local_storage"]) {
-                display: none !important;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
 
     # --- PAGE CONFIGURATION ---
     st.set_page_config(page_title=_("Dashboard LabQuiz"), layout="wide", 
                     page_icon="src/quiz_dash/1F4CA.png")#"📊")
+    
+    # Custom styles
+    apply_custom_styles()
 
     parameters_placeholder = st.container()
     group_placeholder = st.container()
@@ -706,7 +696,19 @@ def main():
                                 width='stretch',
                             )
 
-                            recompute_score()
+                            st.session_state.df_results = recompute_score(
+                                adj_bareme, 
+                                questions, 
+                                exam_title, 
+                                st.session_state.df_results, 
+                                full_df, 
+                                full_df_filt, 
+                                quiz, 
+                                seuil, 
+                                final_weights, 
+                                maxtries
+                            )
+                            st.session_state.show_scores = True
 
                             avg_note = st.session_state.df_results["FinalMark"].mean()
                             std_note = st.session_state.df_results["FinalMark"].std()
