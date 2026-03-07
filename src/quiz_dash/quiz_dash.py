@@ -490,6 +490,7 @@ def main():
             students = [s for s in students_raw]
 
             with tabs_placeholder.container(border=True): 
+                st.empty()
                 st.markdown(f"### 🛠️ {_('Live monitoring & Correction')}")
                 tab_names = [_("📡 Integrity Live"), _("Monitoring"), _("🎯 Correction & Grades")]
                 #selected_tab = st.radio(_("Select a tab"), 
