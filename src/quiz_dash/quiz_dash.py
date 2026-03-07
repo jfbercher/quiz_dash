@@ -488,8 +488,11 @@ def main():
             # 4. Students retrieval
             students_raw = sorted(list(df["student"].dropna().unique()))
             students = [s for s in students_raw]
+            if "render_id" not in st.session_state:
+                st.session_state.render_id = 0
+            st.session_state.render_id += 1
 
-            with tabs_placeholder.container(border=True): 
+            with tabs_placeholder.container(border=True, key=f"main_frame_{st.session_state.render_id}"): 
                 st.empty()
                 st.markdown(f"### 🛠️ {_('Live monitoring & Correction')}")
                 tab_names = [_("📡 Integrity Live"), _("Monitoring"), _("🎯 Correction & Grades")]
