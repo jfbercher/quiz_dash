@@ -423,7 +423,7 @@ def main():
 
     # --- DATA PROCESSING ---
     group_placeholder = st.container()
-    tabs_placeholder = st.container()
+    tabs_placeholder = st.empty()
 
     if url and secret and quiz_file:
         try:
@@ -501,7 +501,7 @@ def main():
                     key="main_nav_state", 
                     label_visibility="collapsed" 
                 )
-                st.divider() # Un petit trait pour séparer proprement du contenu
+                st.divider() 
                 #with tab_mon:
                 if selected_tab == _("📡 Integrity Live"):
                     from labquiz.putils import make_anomalies_df_report, group_anomalies_per_student
