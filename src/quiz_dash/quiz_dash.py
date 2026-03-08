@@ -408,7 +408,7 @@ def main():
         quiz_file = uploaded_file if uploaded_file is not None else st.session_state.get("restored_file")
         st.divider()
     
-        # On vérifie si 'groups' existe (si le fichier est chargé)
+        # Group selection (if several groups)
         if "groups" in st.session_state:
             print("groups exist")
             st.markdown(f"### 👥 {_('Class/Group selection')}")
@@ -531,21 +531,13 @@ def main():
                     groups = [ _('All') ] + all_groups
                     st.session_state.groups = groups
             
-                with group_placeholder:
-                    cola, colb = st.columns([3, 5])
-                    with cola:
-                        st.markdown(_("**Class/Group selection**")) 
-                        #group = st.selectbox(_("Class/Group"), groups, key="group", 
-                        #                     on_change=sync, args=("group",),
-                        #                     label_visibility="collapsed")
-                    
                 
             # Filtering
             if "group" in st.session_state:
                 group = st.session_state.group
-                print("Current group from state:", group)
+                if verbose: print("Current group from state:", group)
             else:
-                print("Group key is not in session state yet")
+                if verbose: print("Group key is not in session state yet")
 
 
             if group == _('All'):
