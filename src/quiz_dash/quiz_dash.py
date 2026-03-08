@@ -55,8 +55,6 @@ def set_defaults():
         st.session_state.uploader_version = 0
     if "last_processed_file" not in st.session_state:
         st.session_state.last_processed_file = None
-    if 'tabs_placeholder' not in st.session_state:
-        st.session_state.tabs_placeholder = st.empty()
 
 def sync(key):
     global local_storage 
@@ -206,6 +204,11 @@ def main():
     global _
     global local_storage #
     
+    # Unique identifier for "tabs"
+    if "render_id" not in st.session_state:
+        st.session_state.render_id = 0
+    st.session_state.render_id += 1
+
     # This is to stabilize the iframe, in the rendering flow
     storage_container = st.empty()
     with storage_container:
@@ -298,7 +301,7 @@ def main():
 
     parameters_placeholder = st.container()
     group_placeholder = st.container()
-    tabs_placeholder = st.empty()
+    #tabs_placeholder = st.empty()
 
 
     # --- SIDEBAR: CONNECTION AND REFRESH RATE ---
@@ -482,6 +485,7 @@ def main():
                 st.session_state.render_id = 0
             st.session_state.render_id += 1
 
+            tabs_placeholder = st.empty()
             with tabs_placeholder.container(border=True, key=f"main_frame_{st.session_state.render_id}"): 
                 st.empty()
                 st.markdown(f"### 🛠️ {_('Live monitoring & Correction')}")
