@@ -579,7 +579,7 @@ def main():
             with tabs_placeholder.container(border=True, key=f"main_frame_{st.session_state.render_id}"): 
                 st.empty()
                 st.markdown(f"### 🛠️ {_('Live monitoring & Correction')}")
-                tab_names = [_("📡 Integrity Live"), _("Monitoring"), _("👀 New Monitoring"), _("🎯 Correction & Grades")]
+                tab_names = [_("📡 Integrity Live"), _("👀 Monitoring"), _("🎯 Correction & Grades")]
                 #selected_tab = st.radio(_("Select a tab"), 
                 #                        tab_names, horizontal=True, 
                 #                        label_visibility="collapsed",
@@ -629,107 +629,9 @@ def main():
                     else:
                         st.dataframe(Tab_report, width='stretch', hide_index=True)
 
-                elif selected_tab == _("Monitoring"): 
-                #with tab_mon_graph:
-                    st.subheader(_("Activity monitoring"))
-                    
-                    df = df.copy()
-                    df.loc[:, "has_seen_correction"] = (
-                        df["event_type"].eq("correction")
-                        .groupby([df["student"], df["quiz_title"]])
-                        .transform("cummax")
-                    ).fillna(False).astype(bool)
-
-
-                    df_last = (
-                        df.query("(event_type == 'validate' or event_type == 'validate_exam') and not has_seen_correction", engine="python")
-                        .groupby(["student", "quiz_title"], as_index=False)
-                        .tail(1)[["student", "quiz_title"]]
-                    )
-
-                    def tronqLabels(labels, K=10):
-                        return [cat[:K] + '..' if (isinstance(cat, str) and (len(cat) > K)) else cat for cat in labels]
-
-                    ## Number of unique quizzes completed per student  ###
-                    def plot_quiz_counts(ax): 
-                        quiz_count_by_student = (
-                            df_last.groupby("student")["quiz_title"]
-                                .apply(len)
-                                .sort_index(ascending=False)
-                        )
-                        ax.barh(tronqLabels(quiz_count_by_student.index), quiz_count_by_student.values, height=0.95)
-                        ax.set_title(_("Number of quizzes completed"))
-                        
-                    ### Obtained scores #########
-                    def plot_score_by_student(ax): 
-                        score_by_student = (
-                            df_last.groupby("student")["score"]
-                                .apply(np.sum)
-                                .sort_index(ascending=False)
-                        )
-
-                        ax.barh(tronqLabels(score_by_student.index), score_by_student.values, height=0.95)
-                        ax.set_title(_("Obtained score"))
-
-                        
-                    ### Quizzes completed by the class #########
-                    def plot_class_results(ax):    
-                        counts = (
-                            df_last["quiz_title"]
-                            .value_counts()
-                            .sort_index(
-                                key=lambda idx: idx.str.extract(r"(\d+)").astype(int)[0]
-                            )   # alphabetical order
-                        )
-                        ax.barh(counts.index, counts.values, height=0.95)
-                        ax.set_title(_("Quizzes completed by the group"))
-
-                    def update_output(plotting_func):
-                            fig, ax = plt.subplots(figsize=(5, 4), constrained_layout=True) 
-                            plotting_func(ax)
-                            ax.tick_params(axis='y', labelsize=8)
-                            fig.set_tight_layout(True)
-                            st.pyplot(fig)
-                    
-                    col_p1, col_p2 = st.columns(2)
-                    with col_p1:
-                        st.subheader(_("Number of quizzes per student"))
-                        update_output(plot_quiz_counts)
-
-                    with col_p2:                
-                        st.subheader(_("Quizzes completed - whole class"))
-                        update_output(plot_class_results)
-                    
-                    quiz_count_by_student = (
-                    df_last.groupby("student")["quiz_title"]
-                        .agg(
-                            nb="size",
-                            quizzes_list=list,
-                            )
-                        .sort_index(ascending=True)
-                    )
-
-                    st.markdown(_("#### Number of individual quizzes"))
-                    #quiz_count_by_student["nb"] = quiz_count_by_student["nb"].astype(int)
-
-                    quiz_count_by_student = quiz_count_by_student.reset_index().rename(columns={"index": "student"})
-                    quiz_count_by_student['student'] = quiz_count_by_student['student'].apply(
-                        lambda x: x.split(',')[0].strip().upper() + ' ' + x.split(',')[1].strip().title() 
-                        if len(x.split(',')) > 1 else x
-                    )
-                    st.dataframe(quiz_count_by_student, 
-                            column_config={
-                            'student': st.column_config.TextColumn(width='medium'),
-                            'nb': st.column_config.NumberColumn(
-                                width="auto",
-                                format="%d"  
-                            ),
-                            'quizzes_list': st.column_config.TextColumn(width='auto')
-                            }
-                        )
-                    
+                
                 ## New Monitoring tab
-                elif selected_tab == _("👀 New Monitoring"): 
+                elif selected_tab == _("👀 Monitoring"): 
                     st.subheader(_("Activity monitoring"))
                     
                     # 1. Data Preparation
