@@ -199,6 +199,74 @@ def apply_custom_styles():
     """
     st.markdown(custom_css, unsafe_allow_html=True)
 
+
+#@st.cache_data
+def prepare_monitoring_data(df):
+    """
+    Filters the dataframe to keep only the last valid attempts 
+    before the correction was shown.
+    """
+    df_copy = df.copy()
+    
+    # Identify if a student has already seen the correction for a specific quiz
+    df_copy.loc[:, "has_seen_correction"] = (
+        df_copy["event_type"].eq("correction")
+        .groupby([df_copy["student"], df_copy["quiz_title"]])
+        .transform("cummax")
+    ).fillna(False).astype(bool)
+
+    # Filter to get the last 'validate' or 'validate_exam' event before correction
+    df_last = (
+        df_copy.query("(event_type == 'validate' or event_type == 'validate_exam') and not has_seen_correction", engine="python")
+        .groupby(["student", "quiz_title"], as_index=False)
+        .tail(1)
+    )
+
+    return df_last
+
+def create_monitoring_plot(data, title, plot_type="student_counts", lang_func=None):
+    """
+    Generates a Matplotlib figure. 
+    Supported types: 'student_counts', 'student_scores', 'class_results', 'hardest_quizzes'
+    """
+    _ = lang_func if lang_func else lambda x: x
+    fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
+    
+    if plot_type == "student_counts":
+        counts = data.groupby("student")["quiz_title"].count().sort_index(ascending=False)
+        labels = [s[:12] + '..' if len(s) > 12 else s for s in counts.index]
+        ax.barh(labels, counts.values, color="#3498db")
+        
+    elif plot_type == "student_scores":
+        scores = data.groupby("student")["score"].sum().sort_index(ascending=False)
+        labels = [s[:12] + '..' if len(s) > 12 else s for s in scores.index]
+        ax.barh(labels, scores.values, color="#f1c40f")
+
+    elif plot_type == "class_results":
+        # Sort using the REGEX discussed (extract digits for numerical order)
+        counts = data["quiz_title"].value_counts().sort_index(
+            key=lambda idx: idx.str.extract(r"(\d+)").fillna(0).astype(int)[0]
+        )
+        ax.barh(counts.index, counts.values, color="#2ecc71")
+
+    elif plot_type == "hardest_quizzes":
+        # Show bottom 5 quizzes by average score
+        avg_scores = data.groupby("quiz_title")["score"].mean().sort_values(ascending=True).head(5)[::-1]
+        ax.barh(avg_scores.index, avg_scores.values, color="#e74c3c")
+        ax.set_xlabel(_("Average Score"))
+
+    ax.set_title(title)
+    ax.tick_params(axis='y', labelsize=9)
+    # Use integer ticks only for count-based plots
+    if plot_type in ["student_counts", "class_results"]:
+        ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
+        
+    return fig
+
+
+#-------------------------------------------------
+#                      MAIN                      #
+#-------------------------------------------------
 def main():
     import streamlit as st
     global _
@@ -339,6 +407,22 @@ def main():
 
         quiz_file = uploaded_file if uploaded_file is not None else st.session_state.get("restored_file")
         st.divider()
+    
+        # On vérifie si 'groups' existe (si le fichier est chargé)
+        if "groups" in st.session_state:
+            print("groups exist")
+            st.markdown(f"### 👥 {_('Class/Group selection')}")
+            group = st.selectbox(
+                _("Class/Group"), 
+                st.session_state.groups, 
+                key="group", 
+                on_change=sync, 
+                args=("group",)
+            )
+            st.divider()
+        else:
+            print("groups does not exist")
+
         
         #st.header(_("⏱️ Monitoring"))
         st.markdown("### ⏱️ " + _("Monitoring"))
@@ -445,25 +529,31 @@ def main():
                 if all_groups:
                     #st.info(_("Select a class or group to monitor."))
                     groups = [ _('All') ] + all_groups
+                    st.session_state.groups = groups
             
                 with group_placeholder:
                     cola, colb = st.columns([3, 5])
                     with cola:
                         st.markdown(_("**Class/Group selection**")) 
-                        group = st.selectbox(_("Class/Group"), groups, key="group", 
-                                             on_change=sync, args=("group",),
-                                             label_visibility="collapsed")
+                        #group = st.selectbox(_("Class/Group"), groups, key="group", 
+                        #                     on_change=sync, args=("group",),
+                        #                     label_visibility="collapsed")
                     
                 
             # Filtering
+            if "group" in st.session_state:
+                group = st.session_state.group
+                print("Current group from state:", group)
+            else:
+                print("Group key is not in session state yet")
+
+
             if group == _('All'):
                 df, df_filt = full_df, full_df_filt
             else:
                 df = full_df.query("class_group == @group")
                 df_filt = full_df_filt.query("class_group == @group")                
-                #df = full_df.query(f"class_group == '{group}'") 
-                #df_filt = full_df_filt.query(f"class_group == '{group}'")
-                #print("df_filt:", df_filt )
+
 
             # 2. Instantiate a quiz with the quiz file CONTAINING expected values
             
@@ -489,7 +579,7 @@ def main():
             with tabs_placeholder.container(border=True, key=f"main_frame_{st.session_state.render_id}"): 
                 st.empty()
                 st.markdown(f"### 🛠️ {_('Live monitoring & Correction')}")
-                tab_names = [_("📡 Integrity Live"), _("Monitoring"), _("🎯 Correction & Grades")]
+                tab_names = [_("📡 Integrity Live"), _("Monitoring"), _("👀 New Monitoring"), _("🎯 Correction & Grades")]
                 #selected_tab = st.radio(_("Select a tab"), 
                 #                        tab_names, horizontal=True, 
                 #                        label_visibility="collapsed",
@@ -637,6 +727,81 @@ def main():
                             'quizzes_list': st.column_config.TextColumn(width='auto')
                             }
                         )
+                    
+                ## New Monitoring tab
+                elif selected_tab == _("👀 New Monitoring"): 
+                    st.subheader(_("Activity monitoring"))
+                    
+                    # 1. Data Preparation
+                    df_last = prepare_monitoring_data(df)
+
+                    if df_last.empty:
+                        st.info(_("No valid activity recorded yet."))
+                    else:
+                        monitoring_tab_names = [_("📊 Monitoring charts"), _("🕵️‍♀️ Activity Summary")]
+                        monitoring_tab = st.segmented_control(
+                            label="Navigation",
+                            options=monitoring_tab_names,
+                            default=monitoring_tab_names[0],
+                            key="monitoring_nav_state", 
+                            label_visibility="collapsed" 
+                        )
+
+                        if monitoring_tab == monitoring_tab_names[0]:
+                            # 2. Grid Layout (2 columns)
+                            # Row 1
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                fig_counts = create_monitoring_plot(df_last, _("Quizzes Completed per Student"), "student_counts", _)
+                                st.pyplot(fig_counts, width="stretch")
+                            with col2:
+                                fig_scores = create_monitoring_plot(df_last, _("Total Scores per Student"), "student_scores", _)
+                                st.pyplot(fig_scores, width="stretch")
+
+                            # Row 2
+                            col3, col4 = st.columns(2)
+                            with col3:
+                                fig_class = create_monitoring_plot(df_last, _("Class Progress per Quiz"), "class_results", _)
+                                st.pyplot(fig_class, width="stretch")
+                            with col4:
+                                fig_hardest = create_monitoring_plot(df_last, _("Top 5 Hardest Quizzes (Avg Score)"), "hardest_quizzes", _)
+                                st.pyplot(fig_hardest, width="stretch")
+                                    
+                        elif monitoring_tab == monitoring_tab_names[1]:
+                        
+
+                            # 3. Detailed Data Table (below the grid)
+                            st.markdown(_("#### Detailed Activity Summary"))
+                            
+                            # Preparing the table data
+                            detailed_stats = (
+                                df_last.groupby("student")
+                                .agg(
+                                    nb_quizzes=("quiz_title", "size"),
+                                    total_score=("score", "sum"),
+                                    quizzes_list=("quiz_title", lambda x: ", ".join(list(x)))
+                                )
+                                .reset_index()
+                            )
+                            
+                            detailed_stats['student'] = detailed_stats['student'].apply(
+                                lambda x: x.split(',')[0].strip().upper() + ' ' + x.split(',')[1].strip().title() 
+                                    if len(x.split(',')) > 1 else x
+                                    )
+
+                            # Displaying the dataframe with formatted headers
+                            st.dataframe(
+                                detailed_stats,
+                                column_config={
+                                    "student": st.column_config.TextColumn(_("Student")),
+                                    "nb_quizzes": st.column_config.NumberColumn(_("Count")),
+                                    "total_score": st.column_config.NumberColumn(_("Total Points"), format="%.1f"),
+                                    "quizzes_list": st.column_config.TextColumn(_("List of Quizzes"))
+                                },
+                                hide_index=True,
+                                width='stretch'
+                            )
+                ## End of new monitoring tab
                 elif selected_tab == _("🎯 Correction & Grades"):
                 #with tab_corr:
                     st.subheader(_("Correction & Grades"))
