@@ -290,7 +290,7 @@ def main():
     local_storage.deleteItem = lambda key: old_deleteItem(key, key=key+'_'+str(time.time()))
 
     monitored_parameters = ["selected_lang", "url", "secret", "params_str", "maxtries",
-                            "group", "seuil", "exam_title",  "bareme_str"]
+                            "groups", "group","seuil", "exam_title",  "bareme_str"]
     
 
     if "_init" not in st.session_state:
@@ -303,7 +303,7 @@ def main():
             if verbose: print(k, stored)
             if stored:
                 st.session_state[k] = json.loads(stored)
-                # print("Restored", k, st.session_state[k])
+                if verbose: print("Restored", k, st.session_state[k])
                 pass
         st.session_state["_init"] = True
 
@@ -410,7 +410,7 @@ def main():
     
         # Group selection (if several groups)
         if "groups" in st.session_state:
-            print("groups exist")
+            if verbose: print("groups exist")
             st.markdown(f"### 👥 {_('Class/Group selection')}")
             group = st.selectbox(
                 _("Class/Group"), 
@@ -421,7 +421,7 @@ def main():
             )
             st.divider()
         else:
-            print("groups does not exist")
+            if verbose: print("groups does not exist")
 
         
         #st.header(_("⏱️ Monitoring"))
@@ -526,10 +526,12 @@ def main():
                     g for g in full_df['class_group'].unique()
                     if g is not None and not pd.isnull(g)
                 ]
+                all_groups.sort()
                 if all_groups:
                     #st.info(_("Select a class or group to monitor."))
                     groups = [ _('All') ] + all_groups
                     st.session_state.groups = groups
+                    sync("groups")
             
                 
             # Filtering
@@ -552,7 +554,7 @@ def main():
             from labquiz.utils import get_full_object_hash, get_big_integrity_hash
             params = eval(params_str)
             quiz = QuizLab("", quiz_file, needAuthentification=False, mandatoryInternet=False, 
-                        in_streamlit=True, **params)              
+                        in_streamlit=True, silentStart=True, **params)              
             wanted_hash = get_full_object_hash(quiz, modules=['main', 'utils'], 
                                                 WATCHLIST=['retries', 'exam_mode', 'test_mode'])
 
