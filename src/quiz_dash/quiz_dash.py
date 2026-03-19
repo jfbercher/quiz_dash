@@ -66,10 +66,19 @@ def set_defaults():
         st.session_state.uploader_version = 0
     if "last_processed_file" not in st.session_state:
         st.session_state.last_processed_file = None
+    if "FinalMarkScale" not in st.session_state:
+        print("⚠️ Setting FinalMarkScale to 20 in set_defaults")
+        st.session_state.FinalMarkScale = "20"
+        st.session_state.TrueFinalMarkScale = "20"
+    if "main_nav_state" not in st.session_state:
+        st.session_state.main_nav_state = _("📡 Integrity Live")
+    if "monitoring_nav_state" not in st.session_state:
+        st.session_state.monitoring_nav_state = _("📊 Monitoring charts")
 
 def sync(key):
     global local_storage 
     global _
+
     if local_storage is None:
         return # Security if local_storage is not ready yet
     try: 
@@ -77,6 +86,9 @@ def sync(key):
     except:
         print("Syncing error for", key, "session state not present")
         return
+    
+    if key == "FinalMarkScale":  
+        st.session_state["TrueFinalMarkScale"] = st.session_state[key]
     if key.startswith("quiz_file_"):
         st.session_state["quiz_file"] = val
         if verbose: print(key, val)
@@ -540,8 +552,6 @@ def prepare_student_data(df_last, marks_df, quiz_stats, selected_student):
 
     student_data = student_data.merge(df_marks, on="quiz_title", suffixes=('_old', ''))
     student_data = student_data.merge(quiz_stats, on="quiz_title", suffixes=('_old', '')).sort_values("timestamp") 
-    if not 'FinalMarkScale' in st.session_state:
-        st.session_state.FinalMarkScale = "20"
     student_data["FinalMark"] = student_data["FinalMark"]*int(st.session_state.FinalMarkScale)/20
 
     student_data.index = student_data['quiz_title']
@@ -550,7 +560,7 @@ def prepare_student_data(df_last, marks_df, quiz_stats, selected_student):
 
 def make_individual_report(selected_student, df_last, student_data, quiz, final_weights, bareme, fullCorrection=True):
     
-    FinalMarkScale = int(st.session_state.FinalMarkScale)
+    FinalMarkScale = int(st.session_state.TrueFinalMarkScale)
     full_avg_note = st.session_state.df_final["FinalMark"].mean()*FinalMarkScale/20
     full_std_note = st.session_state.df_final["FinalMark"].std()*FinalMarkScale/20
     FinalMark = student_data.loc[:, 'FinalMark'].mean()
@@ -771,6 +781,7 @@ def make_individual_report(selected_student, df_last, student_data, quiz, final_
         else:
             st.write(score_obtained) 
 
+
     return html
 
 
@@ -875,7 +886,7 @@ def main():
 
     monitored_parameters = ["selected_lang", "url", "secret", "params_str", "maxtries",
                             "groups", "group","seuil", "exam_title",  "bareme_str",
-                            "main_nav_state", "monitoring_nav_state", 'FinalMarkScale']
+                            "main_nav_state", "monitoring_nav_state", "correction_nav_state", 'FinalMarkScale']
     
 
     if "_init" not in st.session_state:
@@ -1408,7 +1419,13 @@ def main():
                                 with col1:
                                     st.markdown(_("#### Grades Table"))
                                 with col2:
-                                    FinalMarkScale = st.selectbox(_("Final Mark Scale:"), ["100", "20", "4"], 
+                                    if "TrueFinalMarkScale" in st.session_state:
+                                        # Seems that FinalMarkScale is overwritten by browser cache sometimes. This is a Fallback
+                                        st.session_state.FinalMarkScale = st.session_state.TrueFinalMarkScale
+
+                                    options = ["100", "20", "4"]
+                                    current_index = options.index(str(st.session_state.FinalMarkScale)) if str(st.session_state.FinalMarkScale) in options or st.session_state.FinalMarkScale in options else 0
+                                    FinalMarkScale = st.selectbox(_("Final Mark Scale:"), options, 
                                             key="FinalMarkScale", on_change=sync, args=("FinalMarkScale",))
 
                                 avg_note = st.session_state.df_results["FinalMark"].mean()*int(FinalMarkScale)/20
