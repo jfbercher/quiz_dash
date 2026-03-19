@@ -1,6 +1,7 @@
 plotly
 numpy
 pandas
+markdown
 ruamel.yaml
 streamlit>=1.50
 streamlit_autorefresh

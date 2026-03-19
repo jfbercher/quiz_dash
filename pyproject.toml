@@ -15,6 +15,7 @@ dependencies = [
     "numpy",
     "pandas",
     "plotly",
+    "markdown",
     "ruamel.yaml",
     "streamlit>=1.50",
     "streamlit_autorefresh",
