@@ -28,7 +28,6 @@ msgid "All"
 msgstr ""
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:255
-#, fuzzy
 msgid "Number of Quizzes"
 msgstr "Nombre de quizzes réalisés"
 
@@ -37,12 +36,10 @@ msgid "Total Score"
 msgstr "Score total"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:267
-#, fuzzy
 msgid "Number of Students"
 msgstr "Nombre de quizzes par étudiant"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:272
-#, fuzzy
 msgid "Average Score"
 msgstr "Score Moyen"
 
@@ -69,9 +66,8 @@ msgid "Distribution of marks"
 msgstr "Distribution des notes"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:608
-#, fuzzy
 msgid "Correction for"
-msgstr "Correction & Notes"
+msgstr "Correction pour"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:608
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1226
@@ -189,7 +185,6 @@ msgid "**Monitoring & Source**"
 msgstr "**Surveillance**"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:990
-#, fuzzy
 msgid ""
 "Parameters to monitor (e.g.: {'retries':2, 'exam_mode':False, 'test_mode':"
 "False})"
@@ -260,7 +255,6 @@ msgstr "📡 Integrity Live"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1104
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1157
-#, fuzzy
 msgid "👀 Monitoring"
 msgstr "👀 Monitoring"
 
@@ -316,7 +310,6 @@ msgid "No valid activity recorded yet."
 msgstr "Aucune activité enregistrée à ce stade."
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1166
-#, fuzzy
 msgid "📊 Monitoring charts"
 msgstr "📊 Dashboard de Suivi & Correction"
 
@@ -329,14 +322,12 @@ msgid "Student Timeline"
 msgstr "'Timeline' de l'étudiant"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1182
-#, fuzzy
 msgid "Quizzes Completed per Student"
 msgstr "Quizzes réalisés par le groupe"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1186
-#, fuzzy
 msgid "Total Scores per Student"
-msgstr "Grouper les anomalies par étudiant"
+msgstr "Scores totaux par étudiantt"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1192
 msgid "Class Progress per Quiz"
@@ -367,9 +358,8 @@ msgid "#### Student Timeline"
 msgstr "### 'Timeline' de l'étudiant"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1260
-#, fuzzy
 msgid "Correction, Grades & Reports"
-msgstr "Correction & Notes"
+msgstr "Correction, Notes & Rapports"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1262
 msgid "✍🏻 Students reports"

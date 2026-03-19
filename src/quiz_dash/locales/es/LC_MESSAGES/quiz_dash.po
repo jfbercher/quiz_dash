@@ -28,7 +28,6 @@ msgid "All"
 msgstr "Todos"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:255
-#, fuzzy
 msgid "Number of Quizzes"
 msgstr "Número de cuestionarios realizados"
 
@@ -37,12 +36,10 @@ msgid "Total Score"
 msgstr "Puntuación total"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:267
-#, fuzzy
 msgid "Number of Students"
 msgstr "Número de cuestionarios por estudiante"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:272
-#, fuzzy
 msgid "Average Score"
 msgstr "Puntaje Promedio"
 
@@ -69,9 +66,8 @@ msgid "Distribution of marks"
 msgstr "Distribución de las notas"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:608
-#, fuzzy
 msgid "Correction for"
-msgstr "Corrección y Notas"
+msgstr "Corrección de "
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:608
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1226
@@ -189,7 +185,6 @@ msgid "**Monitoring & Source**"
 msgstr "**Monitoreo y Origen**"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:990
-#, fuzzy
 msgid ""
 "Parameters to monitor (e.g.: {'retries':2, 'exam_mode':False, 'test_mode':"
 "False})"
@@ -260,9 +255,8 @@ msgstr "📡 Integridad en Vivo"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1104
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1157
-#, fuzzy
 msgid "👀 Monitoring"
-msgstr "Monitoreo"
+msgstr "👀 Monitoreo"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1104
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1258
@@ -317,7 +311,6 @@ msgid "No valid activity recorded yet."
 msgstr "Aún no se ha registrado ninguna actividad válida."
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1166
-#, fuzzy
 msgid "📊 Monitoring charts"
 msgstr "📊 Tablero de Monitoreo y Corrección"
 
@@ -330,12 +323,10 @@ msgid "Student Timeline"
 msgstr "Cronología del estudiante"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1182
-#, fuzzy
 msgid "Quizzes Completed per Student"
 msgstr "Cuestionarios realizados por el grupo"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1186
-#, fuzzy
 msgid "Total Scores per Student"
 msgstr "Agrupar anomalías por estudiante"
 
@@ -368,7 +359,6 @@ msgid "#### Student Timeline"
 msgstr "#### Cronología del estudiante"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1260
-#, fuzzy
 msgid "Correction, Grades & Reports"
 msgstr "Corrección y Notas"
 
@@ -427,7 +417,6 @@ msgid "Histogram"
 msgstr "Histograma"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1379
-#, fuzzy
 msgid "Scores per question available. Click calculate to see final marks."
 msgstr ""
 "Puntajes por pregunta disponibles. Haga clic en Recalcular para ver las "
@@ -447,7 +436,7 @@ msgstr "🛣️ Cronología del estudiante"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1416
 msgid "📜 Individual Report"
-msgstr "🛣️ Cronología del estudiante"
+msgstr "📜 Informe individual"
 
 #: /Users/bercherj/JFB/dev/quiz_dash/src/quiz_dash/quiz_dash.py:1425
 #, python-brace-format

@@ -622,7 +622,7 @@ def make_individual_report(selected_student, df_last, student_data, quiz, final_
             <p><b>{info_marks}</b></p>
             <p></p>
             <p>{scale_str} {scale}</p>
-            """.format(Report_for=_("Correction for"), Student=(_("Student")), 
+            """.format(Report_for=_("Correction for"), Student=(_("Student")),
                 scale_str=_("Scale:"), scale=bareme_html, student_name=selected_student, info_marks=info_marks)
         html += '<hr style="border: none; border-top: 2px solid #000; margin: 20px 0;">'
     else:
