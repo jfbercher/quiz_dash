@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quiz_dash"
-version = "0.9"
+version = "0.9.3"
 description = "LabQuiz streamlit-based dashboard that provides live tracking, integrity verification, and automated correction."
 readme = "README.md"
 license = { text = "GPL-3.0-or-later" }
@@ -14,13 +14,14 @@ authors = [
 dependencies = [
     "numpy",
     "pandas",
-    "matplotlib",
+    "plotly",
     "ruamel.yaml",
     "streamlit>=1.50",
     "streamlit_autorefresh",
     "streamlit-local-storage",
     "altair==4.2.2",
-    "labquiz>=0.9"
+    "labquiz>=0.9.6",
+    "weasyprint"
 ]
 keywords = ["quizzes", "jupyter"]
 

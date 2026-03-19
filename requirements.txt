@@ -1,9 +1,10 @@
-matplotlib
+plotly
 numpy
 pandas
 ruamel.yaml
 streamlit>=1.50
 streamlit_autorefresh
 streamlit-local-storage
-labquiz
+labquiz>=0.9.6
 altair==4.2.2
+weasyprint
