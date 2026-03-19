@@ -74,6 +74,8 @@ def set_defaults():
         st.session_state.main_nav_state = _("📡 Integrity Live")
     if "monitoring_nav_state" not in st.session_state:
         st.session_state.monitoring_nav_state = _("📊 Monitoring charts")
+    if "correction_nav_state" not in st.session_state:
+        st.session_state.correction_nav_state = _("🎯 Correction & Grades")
 
 def sync(key):
     global local_storage 
@@ -1331,7 +1333,6 @@ def main():
                     correction_tab = st.segmented_control(
                         label="Navigation",
                         options=correction_tab_names,
-                        default=correction_tab_names[0],
                         key="correction_nav_state", 
                         label_visibility="collapsed",
                         on_change=sync, 
