@@ -340,13 +340,6 @@ def show_histogram(marks):
     st.plotly_chart(fig, use_container_width=True)
 
 
-was = '''def plot_student_session_track(data, student_name, quiz_stats):
-    # 1. Data Prep
-    student_data = data[data["student"] == student_name].copy()
-    student_data['timestamp'] = pd.to_datetime(student_data['timestamp'].str.split(' \(').str[0])
-    student_data = student_data.merge(quiz_stats, on="quiz_title").sort_values("timestamp")
-    '''
-
 def plot_student_session_track(student_data, student_name):
     
     # Real elapsed time from the start (in minutes)
@@ -525,10 +518,10 @@ def markdown_to_safe_html(text):
 
 def generate_pdf_report(html):
     from io import BytesIO
-    from weasyprint import HTML
+    from weasyprint import HTML, CSS
 
     buffer = BytesIO()
-    HTML(string=html).write_pdf(target=buffer)
+    HTML(string=html).write_pdf(target=buffer, stylesheets=[CSS(string=pdf_css)])
     pdf_bytes = buffer.getvalue()
     return pdf_bytes #HTML(string=html).write_pdf()
 
@@ -555,8 +548,20 @@ def prepare_student_data(df_last, marks_df, quiz_stats, selected_student):
 
     return student_data
 
-def make_individual_report(selected_student, df_last, student_data, quiz, final_weights, bareme, info_marks, fullCorrection=True):
+def make_individual_report(selected_student, df_last, student_data, quiz, final_weights, bareme, fullCorrection=True):
     
+    FinalMarkScale = int(st.session_state.FinalMarkScale)
+    full_avg_note = st.session_state.df_final["FinalMark"].mean()*FinalMarkScale/20
+    full_std_note = st.session_state.df_final["FinalMark"].std()*FinalMarkScale/20
+    FinalMark = student_data.loc[:, 'FinalMark'].mean()
+    class_mean=full_avg_note
+    class_std=full_std_note
+
+    info_marks = _("Final mark: {FinalMark:.2f} / {FinalMarkScale} -- Class mean: {class_mean:.2f} & Standard deviation: {class_std:.2f}").format(FinalMark=FinalMark, 
+                                        FinalMarkScale=FinalMarkScale, 
+                                        class_mean=class_mean, class_std=class_std)
+
+
     html_output = True
 
     html = """
@@ -770,15 +775,14 @@ def make_individual_report(selected_student, df_last, student_data, quiz, final_
 
 
 def generate_zip_report(students_list, df_last, marks_df, quiz_stats, quiz, 
-                        final_weights, info_marks, fullCorrection, progress_callback=None, pdf_output=True):
-    print("Full correction: ", fullCorrection)
+                        final_weights, fullCorrection, progress_callback=None, pdf_output=True):
     total = len(students_list)
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
         for k, student in enumerate(students_list):
             student_data = prepare_student_data(df_last, marks_df, quiz_stats, student)
             html_bytes = make_individual_report(student, df_last, student_data, quiz, 
-                    final_weights, st.session_state.scale, info_marks, fullCorrection=fullCorrection)
+                    final_weights, st.session_state.scale, fullCorrection=fullCorrection)
             if pdf_output:
                 pdf_bytes = generate_pdf_report(html_bytes)
                 zip_file.writestr(student + ".pdf", pdf_bytes)
@@ -790,6 +794,59 @@ def generate_zip_report(students_list, df_last, marks_df, quiz_stats, quiz,
     zip_bytes = zip_buffer.getvalue()
     return zip_bytes
     
+
+# CSS for PDF exports
+pdf_css = """
+@page {
+    size:A4;
+    page-size: A4;
+    margin: 2.5cm;
+    /* Footer area for numbering */
+    @bottom-right {
+        content: "Page " counter(page) "/" counter(pages);
+        font-family: "Liberation Serif", serif;
+        font-size: 9pt;
+        color: #555;
+    }
+}
+
+body {
+    font-family: "Liberation Serif", "Times New Roman", serif;
+    font-size: 11pt;
+    line-height: 1.4;
+    color: black;
+}
+
+/* Title hierarchy */
+h1 {
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 0.5cm;
+}
+
+h2 {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 0.4cm;
+    margin-bottom: 0.2cm;
+    border-bottom: 0.5pt solid #ccc; /* Small discreet line to separate sections */
+}
+
+h3 {
+    font-size: 11pt; /* Same size as body, but bold/italic */
+    font-weight: bold;
+    font-style: italic;
+    margin-top: 0.3cm;
+    margin-bottom: 0.1cm;
+}
+
+/* Handling intelligent page breaks */
+h1, h2, h3 {
+    page-break-after: avoid; /* Avoid a title being alone at the bottom of the page */
+}
+"""
+
 
 #-------------------------------------------------
 #                      MAIN                      #
@@ -1415,7 +1472,7 @@ def main():
                                     # 4. Make Report
                                     with st.expander(_("📜 Individual Report"), expanded=False):
                                         
-                                        FinalMarkScale = int(st.session_state.FinalMarkScale)
+                                        was = '''FinalMarkScale = int(st.session_state.FinalMarkScale)
                                         full_avg_note = st.session_state.df_final["FinalMark"].mean()*FinalMarkScale/20
                                         full_std_note = st.session_state.df_final["FinalMark"].std()*FinalMarkScale/20
                                         FinalMark = student_data.loc[:, 'FinalMark'].mean()
@@ -1424,7 +1481,7 @@ def main():
 
                                         info_marks = _("Final mark: {FinalMark:.2f} / {FinalMarkScale} -- Class mean: {class_mean:.2f} & Standard deviation: {class_std:.2f}").format(FinalMark=FinalMark, 
                                                                             FinalMarkScale=FinalMarkScale, 
-                                                                            class_mean=class_mean, class_std=class_std)
+                                                                            class_mean=class_mean, class_std=class_std)'''
                                         
                                         col1, col2, col3 = st.columns([4, 4, 4], vertical_alignment="bottom")
                                         with col3:
@@ -1434,7 +1491,7 @@ def main():
                                                 key="fullCorrectionInReport",
                                             )
 
-                                        html = make_individual_report(selected_student, df_last, student_data, quiz, final_weights, st.session_state.scale, info_marks, fullCorrection=fullCorrectionInReport)
+                                        html = make_individual_report(selected_student, df_last, student_data, quiz, final_weights, st.session_state.scale,  fullCorrection=fullCorrectionInReport)
 
                                         with col1:
                                             st.download_button(
@@ -1483,7 +1540,7 @@ def main():
                                         with st.spinner(_("Generating zip...")):
                                             st.session_state.zipped_pdf_reports = generate_zip_report(
                                                 all_students, df_last, marks_df, quiz_stats, quiz, 
-                                                final_weights, info_marks, st.session_state.fullCorrectionInAllReports, 
+                                                final_weights, st.session_state.fullCorrectionInAllReports, 
                                                 progress_callback=update_progress, pdf_output=True)
 
                                     if st.session_state.zipped_pdf_reports is not None:
@@ -1502,7 +1559,7 @@ def main():
                                         with st.spinner(_("Generating zip...")):
                                             st.session_state.zipped_html_reports = generate_zip_report(
                                                 all_students, df_last, marks_df, quiz_stats, quiz, 
-                                                final_weights, info_marks, st.session_state.fullCorrectionInAllReports, 
+                                                final_weights, st.session_state.fullCorrectionInAllReports, 
                                                 progress_callback=update_progress,  pdf_output=False)
                                             
                                     if st.session_state.zipped_html_reports is not None:
