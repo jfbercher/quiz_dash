@@ -22,7 +22,8 @@ Based on the Google Sheet URL specification, the associated read password, and t
 - <mark>view</mark>, over time, the progress of each participant (filterable) and of the entire group,
 - <mark>correct</mark> and retrieve the results table, 
 - with the possibility of adjusting the weight matrix (for multiple-choice questions) and the scoring scale per question,
-- export structured results.
+- export structured results,
+- export individual or whole class graduated scripts. 
 
 ---
 
@@ -95,6 +96,7 @@ Designed to support controlled exam conditions.
 
 * Download corrected results as CSV
 * Recompute scores with updated parameters
+* Export individual PDF or HTML reports
 
 ---
 
