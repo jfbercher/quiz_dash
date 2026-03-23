@@ -112,7 +112,7 @@ Some screenshots of actual monitoring:
 </div>  
 
 <div align="center">
-  <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_quizzes.png" width="50%" height="auto" alt="Monitoring_activity">
+  <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Monitoring_quizzes_2.png" width="50%" height="auto" alt="Monitoring_activity">
 
 `quiz_dash` -- Monitoring of quizzes taken by students and the group. Automatic refresh possible and adjustable (student names have been hidden)
 </div>  
@@ -122,6 +122,19 @@ Some screenshots of actual monitoring:
 
 `quiz_dash` -- Automated correction, with the option to adjust the scoring system (automatic recalculation); (student names have been hidden). Of course, the results table can be downloaded.  
 </div>  
+
+<div align="center">
+  <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Individual_correction.png" width="80%" height="auto" alt="Monitoring_marks image">
+
+`quiz_dash` -- `quiz_dash` -- Individual correction can be generated for a student.
+</div>  
+
+<div align="center">
+  <img src="https://github.com/jfbercher/labquiz/raw/main/docs/doc_images/Zipping_all_pdf_reports.png" width="80%" height="auto" alt="Monitoring_marks image">
+
+`quiz_dash` --  Individual reports can be downloaded so that you can distribute them to the students. 
+</div> 
+
 
 ## Typical Workflow
 
