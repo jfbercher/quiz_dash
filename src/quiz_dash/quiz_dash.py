@@ -565,7 +565,7 @@ def make_individual_report(selected_student, df_last, student_data, quiz, final_
     FinalMarkScale = int(st.session_state.TrueFinalMarkScale)
     full_avg_note = st.session_state.df_final["FinalMark"].mean()*FinalMarkScale/20
     full_std_note = st.session_state.df_final["FinalMark"].std()*FinalMarkScale/20
-    FinalMark = student_data.loc[:, 'FinalMark'].mean()
+    FinalMark = student_data.loc[:, 'FinalMark'].mean()*FinalMarkScale/20
     class_mean=full_avg_note
     class_std=full_std_note
 
